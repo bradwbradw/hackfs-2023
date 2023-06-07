@@ -7,7 +7,7 @@ var port = process.env.PORT || 3000;
 
 app.use(express["static"]('dist'));
 
-app.get('status', function (req, res) {
+app.get('/api/status', function (req, res) {
 
   res.json({ status: 'ok?' });
 });
