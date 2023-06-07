@@ -1,11 +1,20 @@
+
+import 'dotenv/config'
+
 import process from 'node:process'
 import { createLibp2p } from 'libp2p'
+import { webSockets } from '@libp2p/websockets'
 import { tcp } from '@libp2p/tcp'
 import { noise } from '@chainsafe/libp2p-noise'
 import { mplex } from '@libp2p/mplex'
+import { yamux } from '@chainsafe/libp2p-yamux'
 import { multiaddr } from 'multiaddr'
 import { pingService } from 'libp2p/ping'
 
+import { bootstrap } from '@libp2p/bootstrap'
+
+
+var peers = [];
 
 async function startLibp2p() {
 
@@ -14,14 +23,27 @@ async function startLibp2p() {
       // add a listen address (localhost) to accept TCP connections on a random port
       listen: ['/ip4/0.0.0.0/tcp/0']
     },
-    transports: [tcp()],
+    transports: [tcp(), webSockets()],
     connectionEncryption: [noise()],
-    streamMuxers: [mplex()],
+    streamMuxers: [yamux(), mplex()],
+    /*   peerDiscovery: [
+         bootstrap({
+           list: peers, // provide array of multiaddrs
+         })
+       ],*/
     services: {
       ping: pingService({
         protocolPrefix: 'ipfs', // default
       }),
     },
+  });
+
+  node.addEventListener('peer:discovery', (evt) => {
+    console.log('Discovered %s', evt.detail.id.toString()) // Log discovered peer
+  })
+
+  node.addEventListener('peer:connect', (evt) => {
+    console.log('Connected to %s', evt.detail.remotePeer.toString()) // Log connected peer
   })
 
   // start libp2p
@@ -32,6 +54,9 @@ async function startLibp2p() {
   console.log('listening on addresses:')
   node.getMultiaddrs().forEach((addr) => {
     console.log(addr.toString())
+    peers.push(addr.toString());
+    //deduplicate peers
+    peers = [...new Set(peers)];
   })
 
   // ping peer if received multiaddr
@@ -55,4 +80,8 @@ async function startLibp2p() {
   process.on('SIGINT', stop)
 }
 
-export { startLibp2p };
+function getPeers() {
+  return peers;
+}
+
+export { startLibp2p, getPeers };

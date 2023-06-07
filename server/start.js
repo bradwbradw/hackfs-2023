@@ -1,6 +1,7 @@
 
 import express from 'express';
-import { startLibp2p } from './p2p.js';
+import { startLibp2p, getPeers } from './p2p.js';
+import 'dotenv/config'
 
 var app = express();
 
@@ -10,8 +11,23 @@ app.use(express["static"]('dist'));
 
 app.get('/api/status', function (req, res) {
 
-  res.json({ status: 'ok?' });
+  getPeers().then(function (peers) {
+    res.json({
+      status: 'ok?',
+      peers
+    });
+
+  })
+    .catch(err => {
+      res.json({
+        status: 'could not get peers',
+        err
+      })
+    });
+
 });
+
+
 
 
 app.listen(port, function () {
