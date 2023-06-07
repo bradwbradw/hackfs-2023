@@ -32,5 +32,5 @@ app.get('/api/status', function (req, res) {
 
 app.listen(port, function () {
   console.log("Listening on port ".concat(port));
-  startLibp2p();
+  //  startLibp2p();
 });
