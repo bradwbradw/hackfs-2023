@@ -1,7 +1,7 @@
 {
-  "name": "glitch-hello-react",
+  "name": "our-vault",
   "version": "0.0.5",
-  "description": "A simple React single page app, built with Vite and React.",
+  "description": "hack fs 2023 ~ p2p key shard / password manager",
   "scripts": {
     "start": "vite",
     "build": "vite build",
