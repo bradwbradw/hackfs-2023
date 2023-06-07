@@ -1,5 +1,6 @@
 import { Link, Route } from 'wouter'
 import About from './About'
+import Status from './Status'
 import { useState } from 'react'
 
 function Routes() {
@@ -24,6 +25,9 @@ function Routes() {
       </Route>
       <Route path="/about">
         <About />
+      </Route>
+      <Route path="/status">
+        <Status />
       </Route>
     </>
   );

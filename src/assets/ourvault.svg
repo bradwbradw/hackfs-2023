@@ -1,4 +1,9 @@
 <!-- svg code for a rectangle icon -->
 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
   <rect width="24" height="24" fill="none" rx="0" ry="0"/>
+  <path fill="#fff" d="M3,3H21V21H3ZM5,5V19H19V5Z"/>
+  <path fill="#fff" d="M7,7H17V17H7Z"/>
+  <path fill="#fff" d="M9,9H15V15H9Z"/>
+  <path fill="#fff" d="M11,11H13V13H11Z"/>
+  
 </svg>
