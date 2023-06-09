@@ -135,3 +135,5 @@ web_modules
 .firebaserc
 .glitchdotcom.json
 build
+
+.DS_Store
