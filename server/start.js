@@ -1,5 +1,7 @@
 
 import express from 'express';
+import path from 'path';
+import * as url from 'url';
 import { startLibp2p, getPeers } from './p2p.js';
 import 'dotenv/config'
 
@@ -7,7 +9,6 @@ var app = express();
 
 var port = process.env.PORT || 3000;
 
-app.use(express["static"]('dist'));
 
 app.get('/api/status', function (req, res) {
 
@@ -29,6 +30,15 @@ app.get('/api/status', function (req, res) {
 
 
 
+
+app.use(express["static"]('dist'));
+
+app.get('/*', function (req, res) {
+  // serve index.html without using __dirname
+  res.sendFile(path.join(url.fileURLToPath(new URL('.', import.meta.url)), '../dist', 'index.html'));
+
+
+});
 
 app.listen(port, function () {
   console.log("Listening on port ".concat(port));
