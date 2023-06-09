@@ -58,8 +58,9 @@ const Status = function () {
 
 
   function dial(peer) {
-    libp2p.dial(peer).catch(err => {
-      console.log(`Could not dial ${peer}`, err)
+    libp2p.dial(peer.id).catch(err => {
+      console.log(`Could not dial ${peer.id}`, err);
+      alert(`Could not dial \n ${peer.id}: \n${err.message}`)
       setCouldNotDial(couldNotDial => couldNotDial + 1);
     })
   }
