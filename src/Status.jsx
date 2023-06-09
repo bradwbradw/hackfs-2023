@@ -1,119 +1,125 @@
 
 
-import React, { useState } from 'react';
-import { createLibp2p } from 'libp2p'
-import { circuitRelayTransport } from 'libp2p/circuit-relay'
-import { identifyService } from 'libp2p/identify'
-import { kadDHT } from '@libp2p/kad-dht'
-import { webSockets } from '@libp2p/websockets'
-import { webTransport } from '@libp2p/webtransport'
-import { webRTCDirect, webRTC } from '@libp2p/webrtc'
-import { noise } from '@chainsafe/libp2p-noise'
-import { mplex } from '@libp2p/mplex'
-import { yamux } from '@chainsafe/libp2p-yamux'
-import { bootstrap } from '@libp2p/bootstrap'
+import React, { useCallback, useEffect, useState } from 'react';
+import _ from 'lodash';
 
-
+import { getP2P, subscribeEvents, libp2p } from './p2p.jsx';
 
 
 const Status = function () {
 
-  var [n, setN] = React.useState(0);
+  var [peers, setPeers] = React.useState([]);
+  var [disconnected, setDisconnected] = React.useState(0);
+  var [couldNotDial, setCouldNotDial] = React.useState(0);
+  var [connected, setConnected] = React.useState(0);
+  var [dialing, setDialing] = React.useState(0);
   var [status, setStatus] = useState('starting libp2p...');
-  var [output, setOutput] = useState([]);
+  var [id, setId] = useState('');
 
+  var [start, setStart] = useState(false);
 
-  async function startP2P() {
-    // Create our libp2p node
-    const libp2p = await createLibp2p({
-      // transports allow us to dial peers that support certain types of addresses
-      transports: [
-        webSockets(),
-        webTransport(),
-        webRTC(),
-        webRTCDirect(),
-        circuitRelayTransport({
-          // use content routing to find a circuit relay server we can reserve a
-          // slot on
-          discoverRelays: 1
-        })
-      ],
-      connectionEncryption: [noise()],
-      streamMuxers: [yamux(), mplex()],
-      peerDiscovery: [
-        bootstrap({
-          list: [
-            //            '/dnsaddr/bootstrap.libp2p.io/p2p/QmNnooDu7bfjPFoTZYxMNLWUQJyrVwtbZg5gBMjTezGAJN',
-            '/dnsaddr/bootstrap.libp2p.io/p2p/QmbLHAnMoJPWSCR5Zhtx6BHJX9KiKNN6tpvbUcqanj75Nb',
-            //          '/dnsaddr/bootstrap.libp2p.io/p2p/QmZa1sAxajnQjVM8WjWXoMbmPd7NsWhfKsPkErzpm9wGkp',
-            //           '/dnsaddr/bootstrap.libp2p.io/p2p/QmQCU2EcMqAqQPR2i9bChDtGNJchTbq5TbXJJ16u19uLTa',
-            //            '/dnsaddr/bootstrap.libp2p.io/p2p/QmcZf59bWwK5XFi76CZX8cbJ4BhTzzA3gU1ZjYZcYW3dwt'
-          ]
-        })
-      ],
-      services: {
-        // the identify service is used by the DHT and the circuit relay transport
-        // to find peers that support the relevant protocols
-        identify: identifyService(),
+  const setupP2P = useCallback(() => {
+    return getP2P(subscriptions);
+  }, []);
+  //
+  //}, [libP2P]);
 
-        // the DHT is used to find circuit relay servers we can reserve a slot on
-        dht: kadDHT({
-          // browser node ordinarily shouldn't be DHT servers
-          clientMode: true
-        })
-      }
-    })
-
-    function log(txt) {
-      //      console.info(txt)
-      setOutput([...output, txt]);
-    }
-
-    // Listen for new peers
-    libp2p.addEventListener('peer:discovery', (evt) => {
+  var subscriptions = {
+    discovery: (evt) => {
       const peerInfo = evt.detail
-      log(`Found peer ${peerInfo.id.toString()}`)
-
+      console.log(`Found peer ${peerInfo.id.toString()}`)
+      setPeers(peers => [...peers, peerInfo]);
       // dial them when we discover them
-      libp2p.dial(peerInfo.id).catch(err => {
-        log(`Could not dial ${peerInfo.id.toString()}`, err)
-      })
-    })
 
-    // Listen for new connections to peers
-    libp2p.addEventListener('peer:connect', (evt) => {
+      //     libP2P.dial(peerInfo.id).catch(err => {
+      //       console.log(`Could not dial ${peerInfo.id.toString()}`, err)
+      //      setCouldNotDial(couldNotDial => couldNotDial + 1);
+      //   })
+    },
+    connect: (evt) => {
       const peerId = evt.detail
-      log(`Connected to ${peerId.toString()}`)
-    })
-
-    // Listen for peers disconnecting
-    libp2p.addEventListener('peer:disconnect', (evt) => {
+      console.log(`Connected to ${peerId.toString()}`)
+      setConnected(connected => connected + 1);
+    },
+    disconnect: (evt) => {
       const peerId = evt.detail
-      log(`Disconnected from ${peerId.toString()}`)
-    })
-
-    setStatus('libp2p started!')
-    log(`libp2p id is ${libp2p.peerId.toString()}`)
-
-    // Export libp2p to the window so you can play with the API
-    window.libp2p = libp2p
+      console.log(`Disconnected from ${peerId.toString()}`);
+      setDisconnected(disconnected => disconnected + 1);
+    }
   };
 
-  startP2P();
+  useEffect(() => {
+    setupP2P()
+    //    startP2P();
+    return () => {
+
+    }
+  }, []);
+
+
+  function dial(peer) {
+    libp2p.dial(peer).catch(err => {
+      console.log(`Could not dial ${peer}`, err)
+      setCouldNotDial(couldNotDial => couldNotDial + 1);
+    })
+  }
+
   return (
     <>
       <h1>status</h1>
 
       <header>
         <h1 id="status">{status}</h1>
+        <h3>ID: {id ? id : '[no id]'}</h3>
       </header>
 
       <main>
-        <pre id="output">{output.map((l, i) => { return (<div key={i}>{l}</div>); })}</pre>
+        <pre id="output">
+          <p>disconnected: {disconnected}</p>
+          <p>could not dial: {couldNotDial}</p>
+
+        </pre>
       </main>
       <p>
-        number of nodes: {n}
+        number of nodes: {peers.length}
       </p>
+      <div style={{ textAlign: 'left' }}>
+        <h2>peer list</h2>
+        {
+          peers.map((peer, i) => {
+            return (
+              <div key={i} style={{ marginBottom: '3em' }}>
+                peer id: {peer.id.toString()}
+                <ul>
+                  <li>
+                    addresses: <br />{peer.addresses.map(({ multiaddr, isCertified }) => {
+                      return (
+                        <span key={multiaddr.toString()}>
+                          {multiaddr.toString()}, {isCertified ? '[CERTIFIED]' : ''}<br />
+                        </span>)
+                    })}
+
+                  </li>
+
+                  <li>
+                    protocols: {peer.protocols.map((protocol, i) => {
+                      return (<span key={i}>{protocol}</span>)
+                    })}
+                  </li>
+                  <li>
+                    agentVersion: {peer.agentVersion}
+                  </li>
+                  <li>
+                    tags: <pre>{JSON.stringify(peer.tags, null, 2)}</pre>
+                  </li>
+
+                </ul>
+
+                <button onClick={() => dial(peer)}>dial this peer</button>
+              </div>);
+          })
+        }
+      </div>
     </>
   )
 }
