@@ -11,22 +11,44 @@ import { noise } from '@chainsafe/libp2p-noise'
 import { mplex } from '@libp2p/mplex'
 import { yamux } from '@chainsafe/libp2p-yamux'
 import { bootstrap } from '@libp2p/bootstrap'
+import { gossipsub } from '@chainsafe/libp2p-gossipsub'
 
 var libp2p = false;
 
 const options = {
   // transports allow us to dial peers that support certain types of addresses
+  addresses: {
+    listen: [
+      '/webrtc'
+    ]
+  },
   transports: [
     webSockets(),
     webTransport(),
-    webRTC(),
     webRTCDirect(),
     circuitRelayTransport({
       // use content routing to find a circuit relay server we can reserve a
       // slot on
       discoverRelays: 1
-    })
+    }),/*
+    webSockets({
+      filter: filters.all,
+    }),*/
+    webRTC({
+      rtcConfiguration: {
+        iceServers: [{
+          urls: [
+            'stun:stun.l.google.com:19302',
+            'stun:global.stun.twilio.com:3478'
+          ]
+        }]
+      }
+    }),
   ],
+  connectionManager: {
+    maxConnections: 10,
+    minConnections: 5
+  },
   connectionEncryption: [noise()],
   streamMuxers: [yamux(), mplex()],
   peerDiscovery: [
@@ -36,7 +58,7 @@ const options = {
         '/dnsaddr/bootstrap.libp2p.io/p2p/QmbLHAnMoJPWSCR5Zhtx6BHJX9KiKNN6tpvbUcqanj75Nb',
         '/dnsaddr/bootstrap.libp2p.io/p2p/QmZa1sAxajnQjVM8WjWXoMbmPd7NsWhfKsPkErzpm9wGkp',
         '/dnsaddr/bootstrap.libp2p.io/p2p/QmQCU2EcMqAqQPR2i9bChDtGNJchTbq5TbXJJ16u19uLTa',
-        '/dnsaddr/bootstrap.libp2p.io/p2p/QmcZf59bWwK5XFi76CZX8cbJ4BhTzzA3gU1ZjYZcYW3dwt'
+        '/dnsaddr/bootstrap.libp2p.io/p2p/QmcZf59bWwK5XFi76CZX8cbJ4BhTzzA3gU1ZjYZcYW3dwt' * /
       ]
     })
   ],
@@ -45,8 +67,18 @@ const options = {
     // to find peers that support the relevant protocols
     identify: identifyService(),
 
+    pubsub: gossipsub({
+      allowPublishToZeroPeers: true,
+      //msgIdFn: msgIdFnStrictNoSign,
+      ignoreDuplicatePublishError: true,
+    }),
     // the DHT is used to find circuit relay servers we can reserve a slot on
     dht: kadDHT({
+      //protocolPrefix: "/our-vault/0.0.1",
+
+      protocolPrefix: "our-vault",//"/universal-connectivity",
+      maxInboundStreams: 5000,
+      maxOutboundStreams: 5000,
       // browser node ordinarily shouldn't be DHT servers
       clientMode: true
     })

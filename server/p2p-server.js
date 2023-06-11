@@ -31,6 +31,7 @@ function startLibp2p() {
   return createLibp2p({
     addresses: {
       // add a listen address (localhost) to accept TCP connections on a random port
+      //    announce: ['/dnsaddr/our.vault/ws'],
       listen: ['/ip4/0.0.0.0/tcp/0/ws']
     },
     transports: [
@@ -49,7 +50,8 @@ function startLibp2p() {
          })
        ],*/
     services: {
-      dentify: identifyService(),
+      identify: identifyService(),
+      relay: circuitRelayServer(),/*
       relay: circuitRelayServer({ // makes the node function as a relay server
         hopTimeout: 30 * 1000, // incoming relay requests must be resolved within this time limit
         advertise: true,
@@ -62,7 +64,7 @@ function startLibp2p() {
           maxInboundHopStreams: 32, // how many inbound HOP streams are allow simultaneously
           maxOutboundHopStreams: 64 // how many outbound HOP streams are allow simultaneously
         }
-      }),
+      }),*/
       pubsub: gossipsub({ allowPublishToZeroPeers: true }),
       ping: pingService({
         protocolPrefix: 'ipfs', // default
