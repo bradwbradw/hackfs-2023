@@ -5,6 +5,7 @@ import { circuitRelayTransport } from 'libp2p/circuit-relay'
 import { identifyService } from 'libp2p/identify'
 import { kadDHT } from '@libp2p/kad-dht'
 import { webSockets } from '@libp2p/websockets'
+import * as filters from "@libp2p/websockets/filters"
 import { webTransport } from '@libp2p/webtransport'
 import { webRTCDirect, webRTC } from '@libp2p/webrtc'
 import { noise } from '@chainsafe/libp2p-noise'
@@ -12,8 +13,17 @@ import { mplex } from '@libp2p/mplex'
 import { yamux } from '@chainsafe/libp2p-yamux'
 import { bootstrap } from '@libp2p/bootstrap'
 import { gossipsub } from '@chainsafe/libp2p-gossipsub'
+import type { Message, SignedMessage } from '@libp2p/interface-pubsub'
+import { sha256 } from 'multiformats/hashes/sha2'
 
-var libp2p = false;
+var libp2p;
+async function msgIdFnStrictNoSign(msg: Message): Promise<Uint8Array> {
+  var enc = new TextEncoder();
+
+  const signedMessage = msg as SignedMessage
+  const encodedSeqNum = enc.encode(signedMessage.sequenceNumber.toString());
+  return await sha256.encode(encodedSeqNum)
+}
 
 const options = {
   // transports allow us to dial peers that support certain types of addresses
@@ -27,54 +37,48 @@ const options = {
     ]
   },
   transports: [
-    webSockets(),
+    //webSockets(),
     webTransport(),
+    webRTC(),
     webRTCDirect(),
     circuitRelayTransport({
       // use content routing to find a circuit relay server we can reserve a
       // slot on
       discoverRelays: 1
-    }),/*
+    }),
     webSockets({
       filter: filters.all,
-    }),*/
-    webRTC({
-      rtcConfiguration: {
-        iceServers: [{
-          urls: [
-            'stun:stun.l.google.com:19302',
-            'stun:global.stun.twilio.com:3478'
-          ]
-        }]
-      }
     }),
   ],
   connectionManager: {
-    maxConnections: 10,
-    minConnections: 5
+    maxConnections: 100,
+    minConnections: 2
   },
   connectionEncryption: [noise()],
-  streamMuxers: [yamux(), mplex()],
+  streamMuxers: [yamux()],//, mplex()],
   peerDiscovery: [
     bootstrap({
       list: [
         '/dnsaddr/bootstrap.libp2p.io/p2p/QmNnooDu7bfjPFoTZYxMNLWUQJyrVwtbZg5gBMjTezGAJN',
         '/dnsaddr/bootstrap.libp2p.io/p2p/QmbLHAnMoJPWSCR5Zhtx6BHJX9KiKNN6tpvbUcqanj75Nb',
         '/dnsaddr/bootstrap.libp2p.io/p2p/QmZa1sAxajnQjVM8WjWXoMbmPd7NsWhfKsPkErzpm9wGkp',
-        '/dnsaddr/bootstrap.libp2p.io/p2p/QmQCU2EcMqAqQPR2i9bChDtGNJchTbq5TbXJJ16u19uLTa',
-        '/dnsaddr/bootstrap.libp2p.io/p2p/QmcZf59bWwK5XFi76CZX8cbJ4BhTzzA3gU1ZjYZcYW3dwt',
+        //   '/dnsaddr/bootstrap.libp2p.io/p2p/QmQCU2EcMqAqQPR2i9bChDtGNJchTbq5TbXJJ16u19uLTa',
+        //   '/dnsaddr/bootstrap.libp2p.io/p2p/QmcZf59bWwK5XFi76CZX8cbJ4BhTzzA3gU1ZjYZcYW3dwt',
       ]
     })
   ],
   services: {
     // the identify service is used by the DHT and the circuit relay transport
     // to find peers that support the relevant protocols
-    identify: identifyService(),
+    identify: identifyService({
+      protocolPrefix: "our-vault"
+    }),
 
     pubsub: gossipsub({
       allowPublishToZeroPeers: true,
-      //msgIdFn: msgIdFnStrictNoSign,
+      msgIdFn: msgIdFnStrictNoSign,
       ignoreDuplicatePublishError: true,
+      //      globalSignaturePolicy: SignaturePolicy.StrictSign
     }),
     // the DHT is used to find circuit relay servers we can reserve a slot on
     dht: kadDHT({
@@ -89,7 +93,7 @@ const options = {
   }
 };
 
-var loadingP2P = false;
+var loadingP2P;
 function getP2P(subscriptions) {
   // Create our libp2p node
   if (libp2p) {
@@ -141,7 +145,7 @@ function getP2P(subscriptions) {
 
 };
 
-function subscribeEvents({ discovery, connect, disconnect }) {
+function subscribeEvents({ discovery, connect, disconnect, selfUpdate }) {
 
   if (!libp2p) {
     console.log('libp2p not initialized');
@@ -151,6 +155,8 @@ function subscribeEvents({ discovery, connect, disconnect }) {
   libp2p.addEventListener('peer:discovery', discovery);
   libp2p.addEventListener('peer:connect', connect);
   libp2p.addEventListener('peer:disconnect', disconnect);
+
+  libp2p.addEventListener('self:peer:update', selfUpdate)
 
 }
 

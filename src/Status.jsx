@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import _ from 'lodash';
 
-import { getP2P, subscribeEvents, libp2p } from './p2p.jsx';
+import { getP2P, subscribeEvents, libp2p } from './p2p';
 
 
 const Status = function () {
@@ -45,7 +45,14 @@ const Status = function () {
       const peerId = evt.detail
       console.log(`Disconnected from ${peerId.toString()}`);
       setDisconnected(disconnected => disconnected + 1);
+    },
+    selfUpdate: ({ detail: { peer } }) => {
+      const multiaddrs = peer.addresses.map(({ multiaddr }) => multiaddr)
+
+      console.log(`changed multiaddrs: peer ${peer.id.toString()} multiaddrs: ${multiaddrs}`)
+      setId(peer.id.toString());
     }
+
   };
 
   useEffect(() => {
@@ -64,18 +71,19 @@ const Status = function () {
       setCouldNotDial(couldNotDial => couldNotDial + 1);
     })
   }
+  localStorage.setItem('debug', 'libp2p:websockets,libp2p:webtransport,libp2p:kad-dht,libp2p:dialer')
 
   return (
     <>
-      <h1>status</h1>
 
       <header>
-        <h1 id="status">{status}</h1>
+        <h2 id="status">{status}</h2>
         <h3>ID: {id ? id : '[no id]'}</h3>
       </header>
 
       <main>
         <pre id="output">
+          <p>connected: {connected}</p>
           <p>disconnected: {disconnected}</p>
           <p>could not dial: {couldNotDial}</p>
 
@@ -106,9 +114,6 @@ const Status = function () {
                     protocols: {peer.protocols.map((protocol, i) => {
                       return (<span key={i}>{protocol}</span>)
                     })}
-                  </li>
-                  <li>
-                    agentVersion: {peer.agentVersion}
                   </li>
                   <li>
                     tags: <pre>{JSON.stringify(peer.tags, null, 2)}</pre>

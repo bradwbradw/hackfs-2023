@@ -14,6 +14,7 @@ import { yamux } from '@chainsafe/libp2p-yamux'
 import { multiaddr } from 'multiaddr'
 import { pingService } from 'libp2p/ping'
 import { identifyService } from 'libp2p/identify'
+import { kadDHT } from '@libp2p/kad-dht'
 
 import { bootstrap } from '@libp2p/bootstrap'
 
@@ -44,13 +45,21 @@ function startLibp2p() {
       })],
     connectionEncryption: [noise()],
     streamMuxers: [yamux(), mplex()],
-    /*   peerDiscovery: [
-         bootstrap({
-           list: peers, // provide array of multiaddrs
-         })
-       ],*/
+    peerDiscovery: [
+      bootstrap({
+        list: [
+          '/dnsaddr/bootstrap.libp2p.io/p2p/QmNnooDu7bfjPFoTZYxMNLWUQJyrVwtbZg5gBMjTezGAJN',
+          '/dnsaddr/bootstrap.libp2p.io/p2p/QmbLHAnMoJPWSCR5Zhtx6BHJX9KiKNN6tpvbUcqanj75Nb',
+          '/dnsaddr/bootstrap.libp2p.io/p2p/QmZa1sAxajnQjVM8WjWXoMbmPd7NsWhfKsPkErzpm9wGkp',
+          //   '/dnsaddr/bootstrap.libp2p.io/p2p/QmQCU2EcMqAqQPR2i9bChDtGNJchTbq5TbXJJ16u19uLTa',
+          //   '/dnsaddr/bootstrap.libp2p.io/p2p/QmcZf59bWwK5XFi76CZX8cbJ4BhTzzA3gU1ZjYZcYW3dwt',
+        ]
+      })
+    ],
     services: {
-      identify: identifyService(),
+      identify: identifyService({
+        protocolPrefix: "our-vault"
+      }),
       relay: circuitRelayServer(),/*
       relay: circuitRelayServer({ // makes the node function as a relay server
         hopTimeout: 30 * 1000, // incoming relay requests must be resolved within this time limit
@@ -66,9 +75,11 @@ function startLibp2p() {
         }
       }),*/
       pubsub: gossipsub({ allowPublishToZeroPeers: true }),
-      ping: pingService({
-        protocolPrefix: 'ipfs', // default
-      }),
+      dht: kadDHT({
+        kBucketSize: 20,
+        protocolPrefix: 'our-vault',
+        clientMode: false           // Whether to run the WAN DHT in client or server mode (default: client mode)
+      })
     },
   }).then((l) => {
     libp2p = l;
