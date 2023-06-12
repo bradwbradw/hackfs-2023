@@ -20,6 +20,10 @@ const options = {
   addresses: {
     listen: [
       '/webrtc'
+    ],
+    announce: [
+      '/webrtc',
+      '/ws'
     ]
   },
   transports: [
