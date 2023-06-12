@@ -1,6 +1,7 @@
 import { Link, Route } from 'wouter'
 import About from './About'
 import Status from './Status'
+import Dungeon from './Dungeon'
 import { useState } from 'react'
 
 function Routes() {
@@ -28,6 +29,9 @@ function Routes() {
       </Route>
       <Route path="/status">
         <Status />
+      </Route>
+      <Route path="/dungeon/:id">
+        {params => <Dungeon id={params.id} />}
       </Route>
     </>
   );
