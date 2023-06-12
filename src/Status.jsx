@@ -52,14 +52,16 @@ const Status = function () {
       console.log(`changed multiaddrs: peer ${peer.id.toString()} multiaddrs: ${multiaddrs}`)
       setId(peer.id.toString());
     }
-
   };
 
   useEffect(() => {
-    setupP2P()
+    var lib;
+    setupP2P().then(l => lib = l);
     //    startP2P();
     return () => {
-
+      if (lib) {
+        lib.stop();
+      }
     }
   }, []);
 
