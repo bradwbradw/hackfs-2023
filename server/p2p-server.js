@@ -37,6 +37,7 @@ function startLibp2p() {
       tcp(),
       webSockets(),
       webRTC(),
+      webRTCDirect(),
       circuitRelayTransport({ // allows the current node to make and accept relayed connections
         discoverRelays: 0, // how many network relays to find
         reservationConcurrency: 1 // how many relays to attempt to reserve slots on at once
