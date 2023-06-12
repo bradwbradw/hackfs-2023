@@ -1,0 +1,16 @@
+{
+  "addresses": [
+    {
+      "multiaddr": "/ip4/38.59.126.20/tcp/27815",
+      "isCertified": false
+    },
+    {
+      "multiaddr": "/ip4/38.59.126.20/udp/27815/quic",
+      "isCertified": false
+    }
+  ],
+  "protocols": [],
+  "metadata": {},
+  "tags": {},
+  "id": "12D3KooWRTYtBoFmVUKMoDj1MXgQFbUj8VKT6vSEzx5i3PW3UcWA"
+}
