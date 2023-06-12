@@ -73,7 +73,7 @@ const Status = function () {
       setCouldNotDial(couldNotDial => couldNotDial + 1);
     })
   }
-  localStorage.setItem('debug', 'libp2p:websockets,libp2p:webtransport,libp2p:kad-dht,libp2p:dialer')
+  localStorage.setItem('debug', 'libp2p:*,libp2p:websockets,libp2p:webtransport,libp2p:kad-dht,libp2p:dialer')
 
   return (
     <>
