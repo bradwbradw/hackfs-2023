@@ -39,7 +39,16 @@ const options = {
   transports: [
     //webSockets(),
     webTransport(),
-    webRTC(),
+    webRTC({
+      rtcConfiguration: {
+        iceServers: [{
+          urls: [
+            'stun:stun.l.google.com:19302',
+            'stun:global.stun.twilio.com:3478'
+          ]
+        }]
+      }
+    }),
     webRTCDirect(),
     circuitRelayTransport({
       // use content routing to find a circuit relay server we can reserve a
@@ -67,12 +76,13 @@ const options = {
       ]
     })
   ],
+  connectionGater: {
+    denyDialMultiaddr: async () => false,
+  },
   services: {
     // the identify service is used by the DHT and the circuit relay transport
     // to find peers that support the relevant protocols
-    identify: identifyService({
-      protocolPrefix: "our-vault"
-    }),
+    identify: identifyService(),
 
     pubsub: gossipsub({
       allowPublishToZeroPeers: true,
@@ -84,7 +94,7 @@ const options = {
     dht: kadDHT({
       //protocolPrefix: "/our-vault/0.0.1",
 
-      protocolPrefix: "our-vault",//"/universal-connectivity",
+      protocolPrefix: "/our-vault",//"/universal-connectivity",
       maxInboundStreams: 5000,
       maxOutboundStreams: 5000,
       // browser node ordinarily shouldn't be DHT servers
