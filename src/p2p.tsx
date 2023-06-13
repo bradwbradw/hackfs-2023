@@ -49,9 +49,6 @@ const options = {
       }
     }),
     webRTCDirect(),
-    circuitRelayTransport({
-      discoverRelays: 1
-    }),
     webSockets({
       filter: filters.all,
     }),
@@ -62,11 +59,11 @@ const options = {
     minConnections: 2
   },
   connectionEncryption: [noise()],
-  streamMuxers: [yamux()],//, mplex()],
+  streamMuxers: [yamux(), mplex()],
   peerDiscovery: [
     bootstrap({
       list: [
-        //'/ip4/192.168.1.154/tcp/56272/ws/p2p/12D3KooWLzGrMupm2oHE6tt8Jqer964XLo34ezpxCPMW8uyJrL9z',
+        // this is dynamically set after the node's address is fetched, see L110 below
         // '/dnsaddr/bootstrap.libp2p.io/p2p/QmQCU2EcMqAqQPR2i9bChDtGNJchTbq5TbXJJ16u19uLTa',
         //   '/dnsaddr/bootstrap.libp2p.io/p2p/QmcZf59bWwK5XFi76CZX8cbJ4BhTzzA3gU1ZjYZcYW3dwt',
       ]
@@ -88,12 +85,9 @@ const options = {
     }),
     // the DHT is used to find circuit relay servers we can reserve a slot on
     dht: kadDHT({
-      //protocolPrefix: "/our-vault/0.0.1",
-
-      protocolPrefix: "/our-vault",//"/universal-connectivity",
+      protocolPrefix: '/our-vault',
       maxInboundStreams: 5000,
       maxOutboundStreams: 5000,
-      // browser node ordinarily shouldn't be DHT servers
       clientMode: true
     })
   }
@@ -117,6 +111,7 @@ function getP2P(peer) {
         }
       ).then(lib => {
         libp2p = lib;
+        window.libp2p = libp2p;
         return lib;
       });
       return loadingP2P;
