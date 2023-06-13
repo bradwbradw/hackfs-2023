@@ -9,6 +9,7 @@ import { WagmiConfig, createConfig, mainnet } from 'wagmi'
 import { createPublicClient, http } from 'viem'
 import { useAccount, useConnect, useDisconnect } from 'wagmi'
 import { InjectedConnector } from 'wagmi/connectors/injected'
+import { NextUIProvider, createTheme } from '@nextui-org/react'
 
 const wagmiConfig = createConfig({
   autoConnect: true,
@@ -40,6 +41,10 @@ const rooot = createRoot(container);
 rooot.render(
   <React.StrictMode >
     <ErrorBoundary fallback={<p>Something went wrong</p>}>
+
+      <NextUIProvider theme={createTheme({
+        type: 'dark'
+      })} />
       <Navigation />
 
       <WagmiConfig config={wagmiConfig}>

@@ -22,6 +22,7 @@
     "@libp2p/webrtc": "^2.0.7",
     "@libp2p/websockets": "^6.0.3",
     "@libp2p/webtransport": "^2.0.1",
+    "@nextui-org/react": "^1.0.0-beta.13",
     "@vitejs/plugin-basic-ssl": "^1.0.1",
     "@vitejs/plugin-react": "^4.0.0",
     "dotenv": "^16.1.4",

@@ -15,6 +15,7 @@ import { bootstrap } from '@libp2p/bootstrap'
 import { gossipsub } from '@chainsafe/libp2p-gossipsub'
 import type { Message, SignedMessage } from '@libp2p/interface-pubsub'
 import { sha256 } from 'multiformats/hashes/sha2'
+import _ from 'lodash'
 
 var libp2p;
 async function msgIdFnStrictNoSign(msg: Message): Promise<Uint8Array> {
@@ -26,7 +27,6 @@ async function msgIdFnStrictNoSign(msg: Message): Promise<Uint8Array> {
 }
 
 const options = {
-  // transports allow us to dial peers that support certain types of addresses
   addresses: {
     listen: [
       '/webrtc'
@@ -37,7 +37,6 @@ const options = {
     ]
   },
   transports: [
-    //webSockets(),
     webTransport(),
     webRTC({
       rtcConfiguration: {
@@ -51,14 +50,13 @@ const options = {
     }),
     webRTCDirect(),
     circuitRelayTransport({
-      // use content routing to find a circuit relay server we can reserve a
-      // slot on
       discoverRelays: 1
     }),
     webSockets({
       filter: filters.all,
     }),
   ],
+
   connectionManager: {
     maxConnections: 100,
     minConnections: 2
@@ -68,10 +66,8 @@ const options = {
   peerDiscovery: [
     bootstrap({
       list: [
-        '/dnsaddr/bootstrap.libp2p.io/p2p/QmNnooDu7bfjPFoTZYxMNLWUQJyrVwtbZg5gBMjTezGAJN',
-        '/dnsaddr/bootstrap.libp2p.io/p2p/QmbLHAnMoJPWSCR5Zhtx6BHJX9KiKNN6tpvbUcqanj75Nb',
-        '/dnsaddr/bootstrap.libp2p.io/p2p/QmZa1sAxajnQjVM8WjWXoMbmPd7NsWhfKsPkErzpm9wGkp',
-        //   '/dnsaddr/bootstrap.libp2p.io/p2p/QmQCU2EcMqAqQPR2i9bChDtGNJchTbq5TbXJJ16u19uLTa',
+        //'/ip4/192.168.1.154/tcp/56272/ws/p2p/12D3KooWLzGrMupm2oHE6tt8Jqer964XLo34ezpxCPMW8uyJrL9z',
+        // '/dnsaddr/bootstrap.libp2p.io/p2p/QmQCU2EcMqAqQPR2i9bChDtGNJchTbq5TbXJJ16u19uLTa',
         //   '/dnsaddr/bootstrap.libp2p.io/p2p/QmcZf59bWwK5XFi76CZX8cbJ4BhTzzA3gU1ZjYZcYW3dwt',
       ]
     })
@@ -104,7 +100,7 @@ const options = {
 };
 
 var loadingP2P;
-function getP2P(subscriptions) {
+function getP2P(peer) {
   // Create our libp2p node
   if (libp2p) {
     return Promise.resolve(libp2p);
@@ -112,61 +108,41 @@ function getP2P(subscriptions) {
     if (loadingP2P) {
       return Promise.resolve(loadingP2P)
     } else {
-      loadingP2P = createLibp2p(options).then(lib => {
+      loadingP2P = createLibp2p(
+        {
+          ...options,
+          peerDiscovery: [
+            bootstrap({ list: [peer] })
+          ]
+        }
+      ).then(lib => {
         libp2p = lib;
-        subscribeEvents(subscriptions);
         return lib;
       });
       return loadingP2P;
     }
   }
 
-  /*
-  // Listen for new peers
-  libp2p.addEventListener('peer:discovery', (evt) => {
-    const peerInfo = evt.detail
-    console.log(`Found peer ${peerInfo.id.toString()}`)
-
-    // dial them when we discover them
-    libp2p.dial(peerInfo.id).catch(err => {
-      console.log(`Could not dial ${peerInfo.id.toString()}`, err)
-      setCouldNotDial(couldNotDial + 1);
-    })
-  })
-
-  // Listen for new connections to peers
-  libp2p.addEventListener('peer:connect', (evt) => {
-    const peerId = evt.detail
-    console.log(`Connected to ${peerId.toString()}`)
-    setConnected(connected + 1);
-  })
-
-  // Listen for peers disconnecting
-  libp2p.addEventListener('peer:disconnect', (evt) => {
-    const peerId = evt.detail
-    console.log(`Disconnected from ${peerId.toString()}`);
-    setDisconnected(disconnected + 1);
-  })
-
-  setStatus('libp2p started!')
-  console.log(`libp2p id is ${libp2p.peerId.toString()}`)
-  setId(libp2p.peerId.toString());
-  */
-
 };
 
-function subscribeEvents({ discovery, connect, disconnect, selfUpdate }) {
+function subscribeEvents(libp2p, { discovery, connect, disconnect, selfUpdate }) {
 
   if (!libp2p) {
     console.log('libp2p not initialized');
     return;
   }
-
+  libp2p.removeEventListener('peer:discovery', discovery);
   libp2p.addEventListener('peer:discovery', discovery);
+
+  libp2p.removeEventListener('peer:connect', connect);
   libp2p.addEventListener('peer:connect', connect);
+
+  libp2p.removeEventListener('peer:disconnect', disconnect);
   libp2p.addEventListener('peer:disconnect', disconnect);
 
-  libp2p.addEventListener('self:peer:update', selfUpdate)
+  libp2p.removeEventListener('self:peer:update', selfUpdate);
+  libp2p.addEventListener('self:peer:update', selfUpdate);
+  console.log('subscribed eventz');
 
 }
 

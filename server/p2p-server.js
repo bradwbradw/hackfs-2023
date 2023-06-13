@@ -31,31 +31,19 @@ function startLibp2p() {
 
   return createLibp2p({
     addresses: {
-      // add a listen address (localhost) to accept TCP connections on a random port
-      //    announce: ['/dnsaddr/our.vault/ws'],
       listen: ['/ip4/0.0.0.0/tcp/0/ws']
     },
     transports: [
       tcp(),
       webSockets(),
       webRTC(),
+      webRTCDirect(),
       circuitRelayTransport({ // allows the current node to make and accept relayed connections
         discoverRelays: 0, // how many network relays to find
         reservationConcurrency: 1 // how many relays to attempt to reserve slots on at once
       })],
     connectionEncryption: [noise()],
     streamMuxers: [yamux(), mplex()],
-    peerDiscovery: [
-      bootstrap({
-        list: [
-          '/dnsaddr/bootstrap.libp2p.io/p2p/QmNnooDu7bfjPFoTZYxMNLWUQJyrVwtbZg5gBMjTezGAJN',
-          '/dnsaddr/bootstrap.libp2p.io/p2p/QmbLHAnMoJPWSCR5Zhtx6BHJX9KiKNN6tpvbUcqanj75Nb',
-          '/dnsaddr/bootstrap.libp2p.io/p2p/QmZa1sAxajnQjVM8WjWXoMbmPd7NsWhfKsPkErzpm9wGkp',
-          //   '/dnsaddr/bootstrap.libp2p.io/p2p/QmQCU2EcMqAqQPR2i9bChDtGNJchTbq5TbXJJ16u19uLTa',
-          //   '/dnsaddr/bootstrap.libp2p.io/p2p/QmcZf59bWwK5XFi76CZX8cbJ4BhTzzA3gU1ZjYZcYW3dwt',
-        ]
-      })
-    ],
     services: {
       identify: identifyService({
         protocolPrefix: "our-vault"
