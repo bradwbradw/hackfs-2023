@@ -3,10 +3,13 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import _ from 'lodash';
 
-import { getP2P, subscribeEvents, libp2p } from './p2p';
+import { getP2P, subscribeEvents } from './p2p';
+import LibP2PControls from './components/LibP2PControls';
 
 
 const Status = function () {
+
+  const [libP2P, setLibP2P] = useState(null);
 
   var [peers, setPeers] = React.useState([]);
   var [disconnected, setDisconnected] = React.useState(0);
@@ -15,14 +18,6 @@ const Status = function () {
   var [dialing, setDialing] = React.useState(0);
   var [status, setStatus] = useState('starting libp2p...');
   var [id, setId] = useState('');
-
-  var [start, setStart] = useState(false);
-
-  const setupP2P = useCallback(() => {
-    return getP2P(subscriptions);
-  }, []);
-  //
-  //}, [libP2P]);
 
   var subscriptions = {
     discovery: (evt) => {
@@ -56,28 +51,44 @@ const Status = function () {
 
   useEffect(() => {
     var lib;
-    setupP2P().then(l => lib = l);
+    fetch('/api/peer-info').then(r => r.json()).then((data) => {
+      var peerAddress = _.first(_.get(data, 'peers', []));
+      getP2P(peerAddress).then(l => {
+        setLibP2P(l);
+
+        subscribeEvents(l, subscriptions);
+      });
+    });
+    console.log('setup lib p2p');
     //    startP2P();
     return () => {
       if (lib) {
+        console.log('libp2p stopped');
         lib.stop();
       }
     }
   }, []);
 
-
   function dial(peer) {
-    libp2p.dial(peer.id).catch(err => {
+    libP2P.dial(peer.id).catch(err => {
       console.log(`Could not dial ${peer.id}`, err);
       alert(`Could not dial \n ${peer.id}: \n${err.message}`)
       setCouldNotDial(couldNotDial => couldNotDial + 1);
     })
   }
-  localStorage.setItem('debug', 'libp2p:*,libp2p:websockets,libp2p:webtransport,libp2p:kad-dht,libp2p:dialer')
-
   return (
     <>
+      <LibP2PControls libp2p={libP2P} setLibP2P={setLibP2P} setStopFn={() => {
+        if (libP2P && libP2P.stop) {
+          libP2P.stop();
+        }
+      }}
+        defaults={{
+          debug: false,
+          transportNames: 'webTransport webRTC webRTCDirect circuitRelayTransport webSockets'.split(' '),
 
+        }}
+      />
       <header>
         <h2 id="status">{status}</h2>
         <h3>ID: {id ? id : '[no id]'}</h3>
