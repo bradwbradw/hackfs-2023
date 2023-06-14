@@ -1,16 +1,18 @@
 
 import React from "react";
 import { useState } from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 
 import { useAccount } from 'wagmi'
 import { isAddress } from 'viem'
 import { Input, Button, Grid, useInput, Checkbox } from "@nextui-org/react";
 
 import GuardianEditor from "../components/GuardianEditor";
+import OurVaultContract from "../modules/OurVaultContract";
 
 function Create() {
   const { address, isConnecting, isDisconnected } = useAccount();
+  const [location, setLocation] = useLocation();
 
   var defaultFormData = {
     guardians: [
@@ -34,6 +36,15 @@ function Create() {
 
   const [formData, setFormData] = useState(defaultFormData);
 
+  function submitForm() {
+    OurVaultContract.create(formData)
+      .then(() => {
+        setLocation('/room/asdfnewpageid')
+      })
+      .catch((err) => {
+
+      })
+  }
 
   function addGuardian() {
     var newGuardian = {
@@ -150,7 +161,7 @@ function Create() {
 
 
               <div className='flexCenter flexColumn'>
-                <Button size="xl" disabled={validityMessage(formData) !== ""}>Continue</Button>
+                <Button size="xl" disabled={validityMessage(formData) !== ""} onPress={submitForm}>Continue</Button>
                 <p style={{ color: 'lime' }}>{validityMessage(formData)}</p>
               </div>
             </form>
