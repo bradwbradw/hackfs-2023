@@ -1,28 +1,16 @@
-import { Link, Route } from 'wouter'
-import About from './About'
-import Status from './Status'
-import Dungeon from './Dungeon'
-import { useState } from 'react'
+import { Route } from 'wouter'
+import Home from './pages/Home'
+import About from './pages/About'
+import Status from './pages/Status'
+import Room from './pages/Room'
+import Create from './pages/Create'
 
 function Routes() {
 
-  const [count, setCount] = useState(0)
   return (
     <>
       <Route path="/">
-
-        <h1>our vault</h1>
-        <div className="card">
-          <button onClick={() => setCount((count) => count + 1)}>
-            count is {count}
-          </button>
-          <p>
-            Our vault is a secure place to store your secrets, sharding then across our encrypted P2P network.
-          </p>
-          <p>
-            <Link href="/about">Learn more</Link>
-          </p>
-        </div>
+        <Home />
       </Route>
       <Route path="/about">
         <About />
@@ -30,8 +18,11 @@ function Routes() {
       <Route path="/status">
         <Status />
       </Route>
-      <Route path="/dungeon/:id">
-        {params => <Dungeon id={params.id} />}
+      <Route path="/create">
+        <Create />
+      </Route>
+      <Route path="/room/:id">
+        {params => <Room id={params.id} />}
       </Route>
     </>
   );

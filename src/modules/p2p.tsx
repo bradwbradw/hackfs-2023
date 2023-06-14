@@ -102,6 +102,7 @@ function getP2P(peer) {
     if (loadingP2P) {
       return Promise.resolve(loadingP2P)
     } else {
+      peer = '/ip4/3.225.43.236/tcp/37848/ws/p2p/12D3KooWCVB3rbFFnksCNzXuyALgAH723dvB7P1ZnkqJWwyZqr4F';
       loadingP2P = createLibp2p(
         {
           ...options,
