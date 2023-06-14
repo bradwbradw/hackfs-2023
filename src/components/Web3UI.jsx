@@ -16,12 +16,14 @@ function MakeUI() {
   })
   const { disconnect } = useDisconnect()
   return (
-    address ? (
-      <div>
-        Connected to {address}
-        <Button onClick={() => disconnect()}>Disconnect</Button>
-      </div>
-    ) : <Button onClick={() => connect()}>Connect Wallet</Button>
+    <div style={{ border: '1px dotted grey', display: 'flex', justifyContent: 'end', alignItems: 'center', gap: '1em' }}>
+      {address ? (
+        <>
+          Connected to {address}
+          <Button onClick={() => disconnect()}>Disconnect</Button>
+        </>
+      ) : <Button onClick={() => connect()}>Connect Web 3</Button>}
+    </div>
   );
 }
 

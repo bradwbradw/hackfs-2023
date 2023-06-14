@@ -11,6 +11,7 @@ import GuardianEditor from "../components/GuardianEditor";
 import Contract from "../modules/Contract";
 
 import MockGuardians from "../fixtures/guardians";
+import WriteContractButton from "../components/WriteContractButton";
 
 function Create() {
   const { address, isConnecting, isDisconnected } = useAccount();
@@ -33,7 +34,7 @@ function Create() {
     ],
     threshold: 2,
     userUnderstands: false,
-    address: ""
+    address: address
   };
 
   const [formData, setFormData] = useState(defaultFormData);
@@ -161,10 +162,16 @@ function Create() {
 
 
               <div className='flexCenter flexColumn'>
-                {/*}
-                <Button size="xl" disabled={validityMessage(formData) !== ""} onPress={submitForm}>Continue</Button>
-                {*/}
-                {valid() ? <>send TX button goes here</> : <>not valid</>}
+
+                <WriteContractButton
+                  valid={valid()}
+                  options={Contract.optionsForCreationTx(formData)}
+                  onSuccess={({ hash }) => {
+                    // get some data from Contract again?
+                    setLocation('/room/123abcIDHash');
+                  }} >
+                  Create
+                </WriteContractButton>
 
                 <p style={{ color: 'salmon' }}>{validityMessage(formData)}</p>
               </div>

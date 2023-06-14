@@ -6,6 +6,7 @@ const Navigation = () => {
     <>
       <div style={{ position: 'absolute', top: 0, left: 0 }} >
         <Link to="/"> home </Link>
+        <Link to="create"> create </Link>
         <Link to="about"> about </Link>
         <Link to="status"> status </Link>
       </div>
