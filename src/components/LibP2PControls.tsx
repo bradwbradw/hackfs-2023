@@ -26,7 +26,7 @@ function LibP2PControls({ libP2P, setLibP2P, defaults }) {// peerRouting, conten
   var inits = localStorage.getItem('debug');
   var initDebug = _.isString(inits)
 
-  console.log('init debug', initDebug);
+  //  console.log('init debug', initDebug);
   const [debug, setDebug] = useState(initDebug);
 
   useEffect(() => {
