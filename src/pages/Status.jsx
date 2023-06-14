@@ -18,7 +18,7 @@ const Status = function () {
   var [dialing, setDialing] = React.useState(0);
   var [status, setStatus] = useState('starting libp2p...');
   var [id, setId] = useState('');
-  var [relayNode, setRelayNode] = useState(null);
+  var [bootstrapNodes, setBootstrapNodes] = useState([]);
 
   var subscriptions = {
     discovery: (evt) => {
@@ -53,9 +53,9 @@ const Status = function () {
   useEffect(() => {
     var lib;
     fetch('/api/peer-info').then(r => r.json()).then((data) => {
-      var peerAddress = _.first(_.get(data, 'peers', []));
-      setRelayNode(peerAddress);
-      getP2P(peerAddress).then(l => {
+      var bootstrapPeers = _.get(data, 'peers', []);
+      setBootstrapNodes(bootstrapPeers);
+      getP2P(bootstrapPeers).then(l => {
         setLibP2P(l);
 
         subscribeEvents(l, subscriptions);
@@ -65,8 +65,8 @@ const Status = function () {
     //    startP2P();
     return () => {
       if (lib) {
-        console.log('libp2p stopped');
-        lib.stop();
+        //console.log('libp2p stopped');
+        // lib.stop();
       }
     }
   }, []);
@@ -94,7 +94,8 @@ const Status = function () {
       <header>
         <h2 id="status">{status}</h2>
         <h3>ID: {id ? id : '[no id]'}</h3>
-        <h3> relay node: <br />{relayNode}</h3>
+        {bootstrapNodes.map(b => <h3 key={b}> relay node: <br />{b}</h3>)}
+
       </header>
 
       <main>
