@@ -32,7 +32,11 @@ function startLibp2p() {
 
   return createLibp2p({
     addresses: {
-      listen: ['/ip4/0.0.0.0/tcp/0/ws']
+      listen: [
+        '/ip4/0.0.0.0/tcp/0/wss',
+        '/dnsaddr/our.vault/tcp/0/wss',
+        '/dnsaddr/our-vault.glitch.me/tcp/0/wss'
+      ]
     },
     transports: [
       webSockets({
