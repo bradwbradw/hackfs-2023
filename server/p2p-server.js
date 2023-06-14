@@ -34,6 +34,7 @@ function startLibp2p() {
     addresses: {
       listen: [
         '/ip4/0.0.0.0/tcp/0/wss',
+        '/ip4/3.225.43.236/tcp/0/wss', //our-vault.glitch.me ip address right now
         '/dnsaddr/our.vault/tcp/0/wss',
         '/dnsaddr/our-vault.glitch.me/tcp/0/wss'
       ]
