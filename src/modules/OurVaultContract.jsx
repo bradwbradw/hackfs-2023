@@ -12,6 +12,11 @@ const OurVaultContract = {
       var t = setTimeout(resolve, 1500);
 
     });
+  },
+  encodeSecret: (secret) => {
+    return new Promise((resolve, reject) => {
+
+    });
   }
 };
 
