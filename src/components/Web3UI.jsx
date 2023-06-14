@@ -26,7 +26,7 @@ function MakeUI() {
 }
 
 
-function Web3UI() {
+function Web3UI({ children }) {
 
   const wagmiConfig = createConfig({
     autoConnect: true,
@@ -41,6 +41,7 @@ function Web3UI() {
   return (
     <WagmiConfig config={wagmiConfig}>
       <MakeUI />
+      {children}
     </WagmiConfig>
   );
 }

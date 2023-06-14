@@ -13,12 +13,14 @@ const rooot = createRoot(container);
 rooot.render(
   <React.StrictMode >
     <ErrorBoundary fallback={<p>Something went wrong</p>}>
-      <Web3UI />
       <NextUIProvider theme={createTheme({
         type: 'dark'
       })} />
       <Navigation />
-      <Routes />
+
+      <Web3UI >
+        <Routes />
+      </Web3UI>
     </ErrorBoundary>
   </React.StrictMode >
 );

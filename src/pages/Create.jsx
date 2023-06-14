@@ -8,7 +8,9 @@ import { isAddress } from 'viem'
 import { Input, Button, Grid, useInput, Checkbox } from "@nextui-org/react";
 
 import GuardianEditor from "../components/GuardianEditor";
-import OurVaultContract from "../modules/OurVaultContract";
+import Contract from "../modules/Contract";
+
+import MockGuardians from "../fixtures/guardians";
 
 function Create() {
   const { address, isConnecting, isDisconnected } = useAccount();
@@ -37,13 +39,6 @@ function Create() {
   const [formData, setFormData] = useState(defaultFormData);
 
   function submitForm() {
-    OurVaultContract.create(formData)
-      .then(() => {
-        setLocation('/room/asdfnewpageid')
-      })
-      .catch((err) => {
-
-      })
   }
 
   function addGuardian() {
@@ -104,6 +99,10 @@ function Create() {
     return "";
   }
 
+  function valid() {
+    return validityMessage(formData) === "";
+  }
+
   function guardiansText() {
     var busNumber = busNumberr();//numGuardians() - formData.threshold + 1;
     var text1 = `Your vault requires ${formData.threshold} out of ${numGuardians()} guardians to be able to digitally sign,
@@ -119,6 +118,7 @@ function Create() {
   return (
     <div className="Create">
       <h1>Create</h1>
+      <button onClick={() => setFormData({ ...formData, guardians: MockGuardians })}>dev aid fill in</button>
       <div>
         <div>
           {address ? (
@@ -161,8 +161,12 @@ function Create() {
 
 
               <div className='flexCenter flexColumn'>
+                {/*}
                 <Button size="xl" disabled={validityMessage(formData) !== ""} onPress={submitForm}>Continue</Button>
-                <p style={{ color: 'lime' }}>{validityMessage(formData)}</p>
+                {*/}
+                {valid() ? <>send TX button goes here</> : <>not valid</>}
+
+                <p style={{ color: 'salmon' }}>{validityMessage(formData)}</p>
               </div>
             </form>
           ) : (<>
