@@ -3,8 +3,8 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import _ from 'lodash';
 
-import { getP2P, subscribeEvents } from './p2p';
-import LibP2PControls from './components/LibP2PControls';
+import { getP2P, subscribeEvents } from '../modules/p2p';
+import LibP2PControls from '../components/LibP2PControls';
 
 
 const Status = function () {
