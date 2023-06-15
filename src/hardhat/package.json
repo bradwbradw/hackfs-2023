@@ -1,0 +1,12 @@
+{
+  "name": "hackfs-2023",
+  "scripts": {
+    "build": "hardhat compile"
+  },
+  "devDependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.2.3",
+    "@openzeppelin/contracts": "^4.9.1",
+    "ethers": "^6.6.0",
+    "hardhat": "^2.15.0"
+  }
+}
