@@ -22,6 +22,19 @@ import { bootstrap } from '@libp2p/bootstrap'
 import { fromString as uint8ArrayFromString } from "uint8arrays/from-string";
 import { toString as uint8ArrayToString } from "uint8arrays/to-string";
 
+import fs from 'fs'
+import https from 'https'
+import http from 'http';
+
+
+const httpServer = https.createServer({
+  key: fs.readFileSync('server/key.pem'),
+  cert: fs.readFileSync('server/cert.pem')
+})
+
+
+//const httpServer = http.createServer();
+
 var peers = [];
 
 var libp2p;
@@ -33,15 +46,21 @@ function startLibp2p() {
   return createLibp2p({
     addresses: {
       listen: [
+        '/dnsaddr/our.vault/tcp/0/tls/ws',
+        '/dns/our.vault/tcp/0/tls/ws',
+        '/dnsaddr/our-vault.glitch.me/tcp/0/wss',
+        '/dns/our-vault.glitch.me/tcp/0/wss',
         '/ip4/0.0.0.0/tcp/0/wss',
         '/ip4/3.225.43.236/tcp/0/wss', //our-vault.glitch.me ip address right now
-        '/dnsaddr/our.vault/tcp/0/wss',
-        '/dnsaddr/our-vault.glitch.me/tcp/0/wss'
       ]
     },
     transports: [
       webSockets({
-        filter: filters.all
+        filter: filters.all,
+        websocket: {
+          rejectUnauthorized: false
+        },
+        //        server: httpServer
       })],
     connectionEncryption: [noise()],
     streamMuxers: [yamux(), mplex()],

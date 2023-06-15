@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import _ from 'lodash';
 
-import { getP2P, subscribeEvents } from '../modules/p2p';
+import * as P2P from '../modules/p2p';
 import LibP2PControls from '../components/LibP2PControls';
 
 
@@ -50,6 +50,8 @@ const Status = function () {
     }
   };
 
+
+  /*
   useEffect(() => {
     var lib;
     fetch('/api/peer-info').then(r => r.json()).then((data) => {
@@ -70,6 +72,8 @@ const Status = function () {
       }
     }
   }, []);
+
+  */
 
   function dial(peer) {
     libP2P.dial(peer.id).catch(err => {

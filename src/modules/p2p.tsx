@@ -15,7 +15,7 @@ import { bootstrap } from '@libp2p/bootstrap'
 import { gossipsub } from '@chainsafe/libp2p-gossipsub'
 import type { Message, SignedMessage } from '@libp2p/interface-pubsub'
 import { sha256 } from 'multiformats/hashes/sha2'
-import _ from 'lodash'
+import _, { create } from 'lodash'
 
 var libp2p;
 async function msgIdFnStrictNoSign(msg: Message): Promise<Uint8Array> {
@@ -26,18 +26,18 @@ async function msgIdFnStrictNoSign(msg: Message): Promise<Uint8Array> {
   return await sha256.encode(encodedSeqNum)
 }
 
+var relayNodeJson = await fetch('/api/peer-info');
+var relayNode = await relayNodeJson.json();
+var relayNodePeers = _.get(relayNode, 'peers', []);
+
 const options = {
   addresses: {
     listen: [
       '/webrtc'
-    ],
-    announce: [
-      '/webrtc',
-      '/ws'
     ]
   },
   transports: [
-    webTransport(),
+    //    webTransport(),
     webRTC({
       rtcConfiguration: {
         iceServers: [{
@@ -48,9 +48,9 @@ const options = {
         }]
       }
     }),
-    webRTCDirect(),
+    //    webRTCDirect(),
     webSockets({
-      filter: filters.all,
+      filter: filters.all
     }),
   ],
 
@@ -62,11 +62,7 @@ const options = {
   streamMuxers: [yamux(), mplex()],
   peerDiscovery: [
     bootstrap({
-      list: [
-        // this is dynamically set after the node's address is fetched, see L110 below
-        // '/dnsaddr/bootstrap.libp2p.io/p2p/QmQCU2EcMqAqQPR2i9bChDtGNJchTbq5TbXJJ16u19uLTa',
-        //   '/dnsaddr/bootstrap.libp2p.io/p2p/QmcZf59bWwK5XFi76CZX8cbJ4BhTzzA3gU1ZjYZcYW3dwt',
-      ]
+      list: relayNodePeers
     })
   ],
   connectionGater: {
@@ -142,5 +138,9 @@ function subscribeEvents(libp2p, { discovery, connect, disconnect, selfUpdate })
 
 }
 
+const P2P = createLibp2p(options);
 
-export { getP2P, subscribeEvents, libp2p }
+console.log('exporting')
+export default P2P;
+
+//export { getP2P, subscribeEvents, libp2p }
