@@ -17,6 +17,15 @@ function track(req, res, next) {
   next();
 }
 
+const session = ironSession({
+  cookieName: "iron-session/our-vault-session",
+  password: process.env.SECRET_COOKIE_PASSWORD,
+  cookieOptions: {
+    secure: true// process.env.NODE_ENV === "production",
+  },
+});
+
+app.use(session);
 app.use(track);
 
 var port = process.env.PORT || 3000;
@@ -38,16 +47,6 @@ app.post('/api/verify', async function (req, res) {
     res.status(422).json({ message: 'Invalid nonce.' })
   }
 });
-
-const session = ironSession({
-  cookieName: "iron-session/our-vault-session",
-  password: process.env.SECRET_COOKIE_PASSWORD,
-  cookieOptions: {
-    secure: true// process.env.NODE_ENV === "production",
-  },
-});
-
-app.use(session);
 
 app.get("/api/profile", function (req, res) {
   // now you can access all of the req.session.* utilities
