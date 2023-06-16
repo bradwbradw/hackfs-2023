@@ -4,7 +4,6 @@ import './index.css'
 import './App.css'
 import { ErrorBoundary } from './ErrorBoundary'
 import { Routes } from './Routes'
-import Navigation from './components/Navigation'
 import { NextUIProvider, createTheme } from '@nextui-org/react'
 import Web3UI from './components/Web3UI'
 
@@ -16,7 +15,6 @@ rooot.render(
       <NextUIProvider theme={createTheme({
         type: 'dark'
       })} />
-      <Navigation />
 
       <Web3UI >
         <Routes />

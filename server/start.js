@@ -7,6 +7,39 @@ import cors from 'cors';
 import { generateNonce, SiweMessage } from 'siwe';
 
 import { ironSession } from "iron-session/express";
+// Dependencies
+import { Hub } from '@anephenix/hub';
+
+// Initialize hub to listen on port 4000
+const hub = new Hub({ port: 4000 });
+// Here's some example data of say cryptocurrency prices
+
+
+// We then attach that function to the RPC action 'get-price'
+//hub.rpc.add('get-price', getPriceFunction);
+
+// Start listening
+hub.listen();
+var interval = setInterval(() => {
+  hub.pubsub.publish(
+    {
+      data: {
+        channel: '123abcIDHash',
+        message: 'i like turtles too' + new Date().getTime()
+      },
+      socket: { clientId: 'steve' }
+    });
+}, 5000);
+
+
+hub.pubsub.subscribe({
+  data: {
+    channel: '123abcIDHash'
+  },
+  socket: {
+    clientId: 'steve'
+  }
+});
 
 var app = express();
 app.use(express.json());
@@ -17,6 +50,15 @@ function track(req, res, next) {
   next();
 }
 
+const session = ironSession({
+  cookieName: "iron-session/our-vault-session",
+  password: process.env.SECRET_COOKIE_PASSWORD,
+  cookieOptions: {
+    secure: true// process.env.NODE_ENV === "production",
+  },
+});
+
+app.use(session);
 app.use(track);
 
 var port = process.env.PORT || 3000;
@@ -38,16 +80,6 @@ app.post('/api/verify', async function (req, res) {
     res.status(422).json({ message: 'Invalid nonce.' })
   }
 });
-
-const session = ironSession({
-  cookieName: "iron-session/our-vault-session",
-  password: process.env.SECRET_COOKIE_PASSWORD,
-  cookieOptions: {
-    secure: true// process.env.NODE_ENV === "production",
-  },
-});
-
-app.use(session);
 
 app.get("/api/profile", function (req, res) {
   // now you can access all of the req.session.* utilities
