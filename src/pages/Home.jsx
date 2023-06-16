@@ -21,7 +21,7 @@ function Home() {
             2) Click "get started" below to visit the vault creation page. You'll connect via Meta Mask, enter the addresses of your Guardians, and initiate the on-chain process.
           </li>
           <li>
-            3) After the vault is created, you'll see your own url for your vault control center page. This is where you can upload the secret you want to protect.
+            3) After the vault is created, you'll see your own url for your vault control center page. This is where you can securely enter your secret to be encrypted and sharded.
           </li>
           <li>
             4) Later, when you need to recover your secret, you can ask your Guardians to visit the same page. Once they authenticate, they'll be able to sign a transaction that will unlock access to your secret.
