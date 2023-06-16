@@ -35,6 +35,10 @@ const Contract = {
       ]
     }
   },
+  optionsForRequestRecoveryTx: (params => {
+    return {
+    };
+  }),
   getGuardians: (param) => {
     return new Promise((resolve, reject) => {
       setTimeout(() => resolve(MockGuardians), 1500);

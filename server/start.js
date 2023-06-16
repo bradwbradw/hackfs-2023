@@ -7,6 +7,39 @@ import cors from 'cors';
 import { generateNonce, SiweMessage } from 'siwe';
 
 import { ironSession } from "iron-session/express";
+// Dependencies
+import { Hub } from '@anephenix/hub';
+
+// Initialize hub to listen on port 4000
+const hub = new Hub({ port: 4000 });
+// Here's some example data of say cryptocurrency prices
+
+
+// We then attach that function to the RPC action 'get-price'
+//hub.rpc.add('get-price', getPriceFunction);
+
+// Start listening
+hub.listen();
+var interval = setInterval(() => {
+  hub.pubsub.publish(
+    {
+      data: {
+        channel: '123abcIDHash',
+        message: 'i like turtles too' + new Date().getTime()
+      },
+      socket: { clientId: 'steve' }
+    });
+}, 5000);
+
+
+hub.pubsub.subscribe({
+  data: {
+    channel: '123abcIDHash'
+  },
+  socket: {
+    clientId: 'steve'
+  }
+});
 
 var app = express();
 app.use(express.json());

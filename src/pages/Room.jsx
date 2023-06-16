@@ -2,24 +2,28 @@
 
 import React, { useEffect } from 'react'
 import Contract from '../modules/Contract'
-import { Button } from '@nextui-org/react';
+import { Button, Input } from '@nextui-org/react';
+import WriteContractButton from '../components/WriteContractButton';
+/* Dependencies
 
-// initialize array with each value a boolean with 30% chance of being true
-function initArray(length) {
-  var arr = new Array(length);
-  for (var i = 0; i < length; i++) {
-    arr[i] = Math.random() > 0.7;
-  }
-  return arr;
-}
+  You will want to import just the HubClient library
+  if you are using a library to import and transpile
+  modules like WebPack for Next.js
 
-var randomArr = initArray(30);
-var n = 0;
+*/
+import HubClient from '@anephenix/hub/lib/client';
 
+import { useAccount } from 'wagmi'
+
+// Create an instance of HubClient
+const hubClient = new HubClient({ url: 'ws://localhost:4000' });
 
 function Room({ id }) {
 
   const [guardians, setGuardians] = React.useState([]);
+  const { address, isConnecting, isDisconnected } = useAccount();
+  function setAddress() { };
+  //  const [address, isConnected] = useAccount();
 
   useEffect(() => {
     Contract.getGuardians().then((guardians) => {
@@ -28,32 +32,66 @@ function Room({ id }) {
     return () => setGuardians([]);
   }, []);
 
+  var timeout = null;
 
-  var unsubscribeWatcher = Contract.getWatcher((events) => {
-    console.log('watch happened', events[0]);
-  });
+  function makeMessage() {
+    return address + ':: I like turtles ' + new Date().getTime();
+  }
+  useEffect(() => {
+    async function subscribeToChannel() {
+      await hubClient.subscribe(id);
+      hubClient.addChannelMessageHandler(id, (message) => {
+        console.log('message received', message);
+      }
+      );
+
+    }
+    async function unsubscribeFromChannel() {
+      await hubClient.unsubscribe(id);
+    }
+
+    timeout = setInterval(() => {
+      hubClient.publish(id, makeMessage());
+    }, 5000);
+
+    subscribeToChannel();
+    return () => {
+      //      await hubClient.unsubscribe(id);
+      unsubscribeFromChannel();
+      clearInterval(timeout);
+    }
+  },
+    [id, address]);
 
   function recover() {
 
   }
 
   function isPresent(guardian) {
-    return randomArr[n++ % 29];
+    return false;
   }
   function isAuthenticated(guardian) {
-    return randomArr[n++ % 29];
+    return false;
   }
   function didSignRecovery(guardian) {
-    return randomArr[n++ % 29];
+    return false;
   }
 
-
+  function canStartRecovery() {
+    return !!address;
+  }
 
   return (
     <>
       <h2>room for id {id}</h2>
 
+
       <div style={{ textAlign: 'left' }}>
+        <h2>Me</h2>
+        <Input label='address' value={address || ''} onChange={(e) => setAddress(e.target.value)} >
+
+        </Input>
+        {address}
         <h3>Guardians</h3>
         {guardians.map((guardian, i) => {
           return (
@@ -70,7 +108,10 @@ function Room({ id }) {
           );
         })}
       </div>
-      <Button onPress={recover}>Start recovery</Button>
+      {canStartRecovery() ?
+        <WriteContractButton options={Contract.optionsForRequestRecoveryTx({ address })} onSuccess={({ hash }) => { }}>
+          Start recovery
+        </WriteContractButton> : <>(recovery unavailable)</>}
       <Button onPress={() => { }}>Modify Vault</Button>
     </>
   )
