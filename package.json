@@ -6,7 +6,7 @@
   "scripts": {
     "start": "if-env NODE_ENV=production && node server/start.js || vite",
     "build": "vite build",
-    "lint": "eslint src --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+    "lint": "eslint frontend --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "serve": "vite preview",
     "postinstall": "if-env NODE_ENV=production && npm run build || echo 'skipping prod build'"
   },
