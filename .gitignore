@@ -129,6 +129,8 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
+pnpm*.yaml
+
 # hardhat subdir build stuff
 hardhat/artifacts
 hardhat/cache

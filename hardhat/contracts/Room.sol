@@ -42,7 +42,7 @@ contract Room is ERC721, AccessControl {
     struct VaultInstanceConfig {
         uint vaultInstanceId;
         address requestor;
-        address[] guardianList;
+        address[] guardiansList;
         Status status;
     }
 
@@ -50,12 +50,12 @@ contract Room is ERC721, AccessControl {
         threshold = _threshold;
     }
 
-    function getrequestor(uint _vaultInstanceId) public view returns(address) {
+    function getRequestor(uint _vaultInstanceId) public view returns(address) {
         return vaultInstances[_vaultInstanceId].requestor;
     }
 
-    function getGuardianList(uint _vaultInstanceId) public view returns(address[] memory) {
-        return vaultInstances[_vaultInstanceId].guardianList;
+    function getGuardiansList(uint _vaultInstanceId) public view returns(address[] memory) {
+        return vaultInstances[_vaultInstanceId].guardiansList;
     }
 
     //Create a Vault Instance arrangement with:
@@ -63,7 +63,7 @@ contract Room is ERC721, AccessControl {
     //2. a list of guardians
     //3. secret shards, one per guardian
 
-    function createVaultInstance(address[] memory _guardianList, bytes32[] memory _shards) external {
+    function createVaultInstance(address[] memory _guardiansList, bytes32[] memory _shards) external {
         //@todo use shards as NFT metadata
 
         //Requestor is msg.sender
@@ -73,16 +73,16 @@ contract Room is ERC721, AccessControl {
 
         //Populate the vaultInstance's config
         vaultInstances[_vaultInstanceId].requestor = address(msg.sender);
-        vaultInstances[_vaultInstanceId].guardianList = _guardianList;
+        vaultInstances[_vaultInstanceId].guardiansList = _guardiansList;
 
         //Count the guardians.
-        uint members = vaultInstances[_vaultInstanceId].guardianList.length;
+        uint members = vaultInstances[_vaultInstanceId].guardiansList.length;
         //_setupRole(REQUESTOR_ROLE, msg.sender);
 
-        //Loop over guardianList and mint them NFTs representing the shards.
+        //Loop over guardiansList and mint them NFTs representing the shards.
         for(uint i = 0; i < members; i++) {
             //Should emit standard event
-            _mint(vaultInstances[_vaultInstanceId].guardianList[i], _tokenIds.current());
+            _mint(vaultInstances[_vaultInstanceId].guardiansList[i], _tokenIds.current());
             _tokenIds.increment();
         }
 
@@ -94,13 +94,16 @@ contract Room is ERC721, AccessControl {
     }
 
     //@todo Anyone of requestor or guardians may call
-    function recoverWithGuardians() public {}
+    function recoverWithGuardians(uint _vaultInstanceId) public {
+        require(vaultInstances[_vaultInstanceId].requestor == msg.sender, 
+        "Sender was neither requestor nor guardian for this instance");
+    }
 
-    function setNewGuardians(uint _vaultInstanceId, address[] memory _guardianList) public onlyRole(REQUESTOR_ROLE) {
+    function setNewGuardians(uint _vaultInstanceId, address[] memory _guardiansList) public {
         //load the vault instance into memory
         if (msg.sender == vaultInstances[_vaultInstanceId].requestor) {
-            //update with new guardianList totally
-            vaultInstances[_vaultInstanceId].guardianList = _guardianList;
+            //update with new guardiansList totally
+            vaultInstances[_vaultInstanceId].guardiansList = _guardiansList;
         }
         
     }
