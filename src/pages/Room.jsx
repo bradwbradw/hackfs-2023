@@ -1,22 +1,30 @@
 
 
-import React, { useEffect } from 'react'
+import React, { useEffect, useLocation } from 'react'
 import Contract from '../modules/Contract'
 import { Button, Input } from '@nextui-org/react';
 import WriteContractButton from '../components/WriteContractButton';
-/* Dependencies
 
-  You will want to import just the HubClient library
-  if you are using a library to import and transpile
-  modules like WebPack for Next.js
-
-*/
 import HubClient from '@anephenix/hub/lib/client';
 
 import { useAccount } from 'wagmi'
 
-// Create an instance of HubClient
-const hubClient = new HubClient({ url: 'ws://localhost:4000' });
+console.log('window', window);
+var wsUrl;
+
+if (window.location.href.indexOf('localhost') > -1) {
+  wsUrl = 'ws://localhost:3000';
+} else {
+  wsUrl = 'ws://our-vault.glitch.me';
+}
+console.log('websocket url', wsUrl);
+const hubClient = new HubClient({ url: wsUrl });
+
+
+
+
+
+
 
 function Room({ id }) {
 
