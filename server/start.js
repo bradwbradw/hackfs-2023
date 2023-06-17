@@ -4,11 +4,13 @@ import path from 'path';
 import * as url from 'url';
 import 'dotenv/config'
 import cors from 'cors';
+
+import repl from 'repl';
 import { generateNonce, SiweMessage } from 'siwe';
 
 import { ironSession } from "iron-session/express";
 // Dependencies
-import { Hub } from '@anephenix/hub';
+import { Hub, HubClient } from '@anephenix/hub';
 
 // Initialize hub to listen on port 4000
 const hub = new Hub({ port: 4000 });
@@ -39,6 +41,23 @@ hub.pubsub.subscribe({
   socket: {
     clientId: 'steve'
   }
+});
+
+
+var hubClient = new HubClient({ url: 'ws://localhost:4000' });
+
+const replInstance = repl.start('> ');
+replInstance.context.hubClient = hubClient;
+
+
+hubClient.subscribe('123abcIDHash').then(() => {
+
+  var hubClientId = hubClient.getClientId();
+  console.log('hub client id', hubClientId);
+  console.log('ready to subscribe and add channel listener')
+  hubClient.addChannelMessageHandler('123abcIDHash', (message) => {
+    console.log('message received', message);
+  });
 });
 
 var app = express();
