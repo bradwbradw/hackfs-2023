@@ -11,15 +11,12 @@ contract Room is ERC721, AccessControl {
     Counters.Counter private _tokenIds;
     Counters.Counter public vaultInstanceCounter;
 
-    //@todo might not need roles if we can check VaultInstanceConfig for certain actions
-    bytes32 public constant REQUESTOR_ROLE = keccak256("REQUESTOR_ROLE");
-    bytes32 public constant GUARDIAN_ROLE = keccak256("GUARDIAN_ROLE");
-
     //Events
+    event RoomThresholdUpdated(uint threshold);
     event VaultInstanceCreated(uint indexed vaultInstanceId, address requestor);
-    event VaultInstanceBurned(uint indexed vaultInstanceId, address[] guardians);
     event VaultInstanceUpdated(uint indexed vaultInstanceId, address[] guardians);
-    event RoomThresholdUpdated(address indexed deployed, uint threshold);
+    event VaultInstanceRecoveryStarted(uint indexed vaultInstanceId, address initiator);
+    event VaultInstanceBurned(uint indexed vaultInstanceId, address requestor);
 
     //Vault Instance status
     //0 (default) Ready
@@ -34,20 +31,31 @@ contract Room is ERC721, AccessControl {
     }
 
     //Room variables
-    Status public status;
     uint public threshold;
+    address public deployer;
+
+    //VaultInstance variables
     mapping(uint => VaultInstanceConfig) public vaultInstances;
+    Status public status;
 
     //config struct
     struct VaultInstanceConfig {
         uint vaultInstanceId;
         address requestor;
         address[] guardiansList;
+        //@todo add uint numGuardians?
         Status status;
     }
 
     constructor(uint _threshold) ERC721("Guardian Marker", "GRDN") {
         threshold = _threshold;
+        deployer = msg.sender;
+    }
+
+    function updateRoom(uint _threshold) public {
+        require(msg.sender == deployer, "Only Deployer may update Room.");
+        threshold = _threshold;
+        emit RoomThresholdUpdated(threshold);
     }
 
     function getRequestor(uint _vaultInstanceId) public view returns(address) {
@@ -64,9 +72,9 @@ contract Room is ERC721, AccessControl {
     //3. secret shards, one per guardian
 
     function createVaultInstance(address[] memory _guardiansList, bytes32[] memory _shards) external {
-        //@todo use shards as NFT metadata
+        //@todo use shards from requestor session as NFT metadata
 
-        //Requestor is msg.sender
+        //Requestor is msg.sender here
 
         //Get the current vault instance number for an ID.
         uint _vaultInstanceId = vaultInstanceCounter.current();
@@ -89,21 +97,50 @@ contract Room is ERC721, AccessControl {
         //Set vaultInstance status
         vaultInstances[_vaultInstanceId].status = Status.Vaulted;
 
+        //Emit creation event
+        emit VaultInstanceCreated(_vaultInstanceId, vaultInstances[_vaultInstanceId].requestor);
+
         //Increment counter for next instance
         vaultInstanceCounter.increment();
     }
 
-    //@todo Anyone of requestor or guardians may call
     function recoverWithGuardians(uint _vaultInstanceId) public {
-        require(vaultInstances[_vaultInstanceId].requestor == msg.sender, 
+
+        //Flag to allow to proceed
+        bool authorization = false;
+        uint members = vaultInstances[_vaultInstanceId].guardiansList.length;
+        
+        //Check if msg.sender == requestor
+        if (vaultInstances[_vaultInstanceId].requestor == msg.sender) {
+            authorization = true;
+        }
+
+        //Check if msg.sender is any of guardians
+        for (uint i = 0; i < members; i++) {
+            //If we already have flag, moves on
+            if (!authorization 
+                && vaultInstances[_vaultInstanceId].guardiansList[i] == msg.sender) {
+                authorization = true;
+                break;
+            }
+
+        }
+        //Check for flag
+        require(authorization == true, 
         "Sender was neither requestor nor guardian for this instance");
+
+        //Emit recover event
+        emit VaultInstanceRecoveryStarted(_vaultInstanceId, msg.sender);
     }
 
     function setNewGuardians(uint _vaultInstanceId, address[] memory _guardiansList) public {
-        //load the vault instance into memory
+        //Requestor only
         if (msg.sender == vaultInstances[_vaultInstanceId].requestor) {
-            //update with new guardiansList totally
+            //replace with new guardiansList entirely
+            delete vaultInstances[_vaultInstanceId].guardiansList;
             vaultInstances[_vaultInstanceId].guardiansList = _guardiansList;
+            //Emit update event
+            emit VaultInstanceUpdated(_vaultInstanceId, _guardiansList);
         }
         
     }
@@ -120,20 +157,30 @@ contract Room is ERC721, AccessControl {
     function checkSignature(address signer, bytes32 hash, bytes memory signature) public view returns(bool valid) {
         if (SignatureChecker.isValidSignatureNow(signer, hash, signature)) {
             //valid signature
-            //
             return true;
         }
         else {
+            //invalid signature
             return false;
         }
     }
 
-    //Overrides.
-    function _burn(uint256 tokenId) internal override(ERC721) {
-        super._burn(tokenId);
-        //@todo how to find the InstanceId from tokenId?
-        //Update the Instance status if any of them get burned.
-        //vaultInstances[_vaultInstanceId].status = Status.Burned;
+    //Allows guardians to burn their soulbound as cleanup after
+    function setVaultInstanceBurned(uint _vaultInstanceId) public {
+        require(msg.sender == vaultInstances[_vaultInstanceId].requestor, "Only requestor may set Status: Burned");
+
+        //Set status
+        vaultInstances[_vaultInstanceId].status = Status.Burned;
+
+        //Emit burn event
+        emit VaultInstanceBurned(_vaultInstanceId, msg.sender);
+    }
+
+    /** Overrides **/
+    function _burn(uint _vaultInstanceId) internal override(ERC721) {
+         if (vaultInstances[_vaultInstanceId].status == Status.Burned) {
+            //super._burn(tokenId);
+         }
     }
 
     function supportsInterface(bytes4 interfaceId)
