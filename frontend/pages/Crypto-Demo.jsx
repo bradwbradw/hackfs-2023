@@ -13,6 +13,7 @@ function CryptoDemo() {
   const [shards, setShards] = useState([]);
   const [encryptedShards, setEncryptedShards] = useState([]);
   const [newGuardians, setNewGuardians] = useState([]);
+  const [shardIPFSHashes, setShardIPFSHashes] = useState([]);
 
   function makeGuardians() {
     var newG = [0, 1, 2].map(i => {
@@ -26,7 +27,21 @@ function CryptoDemo() {
     console.log('new guardians', newG);
     setNewGuardians(newG);
   }
+  function uploadShards() {
 
+    Promise.all([encryptedShards[0]].map(shard => {
+
+      return fetch('api/upload', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ shard })
+      }).then(res => res.json());
+    })).then(hashes => {
+      setShardIPFSHashes(hashes);
+    })
+  }
   return (<div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
     <h2>Our Vault (cryptography demonstration)</h2>
     <Textarea label="secret" value={secret} />
@@ -63,6 +78,23 @@ function CryptoDemo() {
       {encryptedShards.map((shard, index) => {
         return <Input key={index} label={`encrypted shard ${index + 1}`} value={JSON.stringify(shard)} />
       })}
+      <div>
+        <Button onPress={uploadShards}>Upload the encrypted shards to IPFS</Button>
+      </div>
+
+
+    </div> : <></>}
+
+    {shardIPFSHashes.length > 0 ? <div>
+      <h3>IPFS hashes:</h3>
+      {shardIPFSHashes.map((hash, index) => {
+        return <pre key={index} label={`shard ${index + 1} hash`}  >
+          {JSON.stringify(hash, null, 2)}
+          <br />
+          <a href={hash.url} target="_blank">link</a>
+        </pre>
+      })}
+
     </div> : <></>}
   </div>
   );
