@@ -42,7 +42,10 @@ function MakeUI() {
     }
   }
 
-  useEffect(() => { fetchNonce(); }, []);
+  useEffect(() => {
+    //    fetchNonce();
+  },
+    []);
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -60,9 +63,9 @@ function MakeUI() {
       }
     }
 
-    fetchUser();
+    //fetchUser();
+    //window.addEventListener('focus', fetchUser);
 
-    window.addEventListener('focus', fetchUser);
     return () => window.removeEventListener('focus', fetchUser);
   }, []);
 

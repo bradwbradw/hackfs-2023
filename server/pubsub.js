@@ -4,6 +4,7 @@ import repl from 'repl';
 import { Hub, HubClient } from '@anephenix/hub';
 
 async function PubSub(port, server) {
+  return;
 
   const hub = await new Hub({ port, server });
   hub.listen();

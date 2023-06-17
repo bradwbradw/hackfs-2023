@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@anephenix/hub": "^0.0.27",
+    "@metamask/eth-sig-util": "^5.1.0",
     "@nextui-org/react": "^1.0.0-beta.13",
     "@vitejs/plugin-basic-ssl": "^1.0.1",
     "@vitejs/plugin-react": "^4.0.0",
@@ -21,7 +22,7 @@
     "crypto-js": "^4.1.1",
     "dotenv": "^16.1.4",
     "drand-client": "^1.1.0",
-    "eth-sig-util": "^3.0.1",
+    "ethers": "^5.7.2",
     "express": "^4.18.2",
     "if-env": "^1.0.4",
     "iron-session": "^6.3.1",

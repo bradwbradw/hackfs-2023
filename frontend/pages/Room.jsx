@@ -10,22 +10,6 @@ import HubClient from '@anephenix/hub/lib/client';
 
 import { useAccount } from 'wagmi'
 
-console.log('window', window);
-var wsUrl;
-
-if (window.location.href.indexOf('localhost') > -1) {
-  wsUrl = 'ws://localhost:3000';
-} else {
-  wsUrl = 'wss://our-vault.glitch.me';
-}
-console.log('websocket url', wsUrl);
-const hubClient = new HubClient({ url: wsUrl });
-
-
-
-
-
-
 
 function Room({ id }) {
 
@@ -46,47 +30,6 @@ function Room({ id }) {
 
   var timeout = null;
 
-  function makeMessage() {
-    return address + ':: I like turtles ' + new Date().getTime();
-  }
-  useEffect(() => {
-    async function subscribeToChannel() {
-      await hubClient.subscribe(id);
-      hubClient.addChannelMessageHandler(id, (message) => {
-        //console.log('message received', message);
-      }
-      );
-
-    }
-    async function unsubscribeFromChannel() {
-      await hubClient.unsubscribe(id);
-    }
-
-    timeout = setInterval(() => {
-      hubClient.publish(id, makeMessage());
-    }, 5000);
-
-    subscribeToChannel();
-    return () => {
-      //      await hubClient.unsubscribe(id);
-      unsubscribeFromChannel();
-      clearInterval(timeout);
-    }
-  },
-    [id, address]);
-
-  function handleSecret() {
-    var length = secret.length;
-    var chunkSize = Math.ceil(length / guardians.length);
-    //    var shards = 
-    var chunks = _.chunk(secret, chunkSize);//_.zip(_.chunk(secret, guardians.length));
-    console.log('chunks', chunks);
-
-  }
-
-  function recover() {
-
-  }
 
   function isPresent(guardian) {
     return false;
@@ -119,7 +62,7 @@ function Room({ id }) {
             }}></Textarea>
           <br /><br />
           <pre>{secret}</pre>
-          <Button onPress={() => handleSecret()}>Do Backup</Button>
+          <Button >Do Backup</Button>
         </div>
 
         <div style={{ textAlign: 'left' }}>
