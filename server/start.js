@@ -35,6 +35,10 @@ app.get('/*', function (req, res) {
   res.sendFile(path.join(url.fileURLToPath(new URL('.', import.meta.url)), '../dist', 'index.html'));
 });
 
+app.post('/api/status', function (req, res) {
+  // guardian can send post to indicate on the page, authed, 
+});
+
 
 
 var server = http.createServer({

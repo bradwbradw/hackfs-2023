@@ -2,8 +2,9 @@
 
 import React, { useEffect, useLocation } from 'react'
 import Contract from '../modules/Contract'
-import { Button, Input } from '@nextui-org/react';
+import { Button, Input, Textarea } from '@nextui-org/react';
 import WriteContractButton from '../components/WriteContractButton';
+import _ from 'lodash';
 
 import HubClient from '@anephenix/hub/lib/client';
 
@@ -29,6 +30,9 @@ const hubClient = new HubClient({ url: wsUrl });
 function Room({ id }) {
 
   const [guardians, setGuardians] = React.useState([]);
+  const [vaultRoom, setVaultRoom] = React.useState({});
+  const [secret, setSecret] = React.useState('hotel obvious agent lecture gadget evil jealous keen fragile before damp clarify bottle pencil sunshine rampant utility crouch camping weather vehicle lamp trap viscous');
+
   const { address, isConnecting, isDisconnected } = useAccount();
   function setAddress() { };
   //  const [address, isConnected] = useAccount();
@@ -49,7 +53,7 @@ function Room({ id }) {
     async function subscribeToChannel() {
       await hubClient.subscribe(id);
       hubClient.addChannelMessageHandler(id, (message) => {
-        console.log('message received', message);
+        //console.log('message received', message);
       }
       );
 
@@ -71,6 +75,15 @@ function Room({ id }) {
   },
     [id, address]);
 
+  function handleSecret() {
+    var length = secret.length;
+    var chunkSize = Math.ceil(length / guardians.length);
+    //    var shards = 
+    var chunks = _.chunk(secret, chunkSize);//_.zip(_.chunk(secret, guardians.length));
+    console.log('chunks', chunks);
+
+  }
+
   function recover() {
 
   }
@@ -91,31 +104,44 @@ function Room({ id }) {
 
   return (
     <>
-      <h2>room for id {id}</h2>
+      <h2>Vault Room </h2>
+      <h3>id: {id}</h3>
 
+      <div style={{ width: '100vw', display: 'flex', gap: '2em', justifyContent: 'space-evenly', alignItems: 'start' }}>
+        <div style={{ textAlign: 'center', width: '45%', display: 'flex', justifyContent: 'center', flexDirection: 'column' }}>
+          <h2>Backup Secret</h2>
+          <Textarea
+            label='your secret'
+            style={{ fontFamily: 'courier', height: '10em' }}
+            value={secret}
+            onChange={(e) => {
+              setSecret(e.target.value);
+            }}></Textarea>
+          <br /><br />
+          <pre>{secret}</pre>
+          <Button onPress={() => handleSecret()}>Do Backup</Button>
+        </div>
 
-      <div style={{ textAlign: 'left' }}>
-        <h2>Me</h2>
-        <Input label='address' value={address || ''} onChange={(e) => setAddress(e.target.value)} >
+        <div style={{ textAlign: 'left' }}>
+          {address}
+          <h3>Guardians</h3>
+          {guardians.map((guardian, i) => {
+            return (
+              <div key={i}>
+                <h4>{guardian.name}</h4>
+                <p>{guardian.address}</p>
+                <ul>
+                  <li>present? {isPresent(guardian) ? '✅' : '❌'}</li>
+                  <li>authenticated? {isAuthenticated(guardian) ? '✅' : '❌'}</li>
+                  <li>signed recovery? {didSignRecovery(guardian) ? '✅' : '❌'}</li>
+                </ul>
+              </div>
 
-        </Input>
-        {address}
-        <h3>Guardians</h3>
-        {guardians.map((guardian, i) => {
-          return (
-            <div key={i}>
-              <h4>{guardian.name}</h4>
-              <p>{guardian.address}</p>
-              <ul>
-                <li>present? {isPresent(guardian) ? '✅' : '❌'}</li>
-                <li>authenticated? {isAuthenticated(guardian) ? '✅' : '❌'}</li>
-                <li>signed recovery? {didSignRecovery(guardian) ? '✅' : '❌'}</li>
-              </ul>
-            </div>
-
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
+
       {canStartRecovery() ?
         <WriteContractButton options={Contract.optionsForRequestRecoveryTx({ address })} onSuccess={({ hash }) => { }}>
           Start recovery

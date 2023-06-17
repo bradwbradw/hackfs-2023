@@ -8,6 +8,9 @@ async function PubSub(port, server) {
   const hub = await new Hub({ port, server });
   hub.listen();
   console.log('ws hub listening on port ' + port);
+
+
+  // split off somewhere else where ID can be dynamic
   var interval = setInterval(() => {
     hub.pubsub.publish(
       {
