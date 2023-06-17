@@ -69,7 +69,7 @@ contract Room is ERC721, AccessControl {
     //Create a Vault Instance arrangement with:
     //1. a requestor
     //2. a list of guardians
-    //3. secret shards, one per guardian
+    //3. encrypted shards, one per guardian
 
     function createVaultInstance(address[] memory _guardiansList, bytes32[] memory _shards) external {
         //@todo use shards from requestor session as NFT metadata
@@ -128,6 +128,9 @@ contract Room is ERC721, AccessControl {
         //Check for flag
         require(authorization == true, 
         "Sender was neither requestor nor guardian for this instance");
+
+        //Set recover status
+        vaultInstances[_vaultInstanceId].status = Status.Recoverable;
 
         //Emit recover event
         emit VaultInstanceRecoveryStarted(_vaultInstanceId, msg.sender);
