@@ -13,9 +13,9 @@ const OurVaultCrypto = {
     console.log(comb, key);
     return shares;
   },
-  encryptShareWithGuardian(share, privateKey) {
+  encryptShareWithGuardian(share, guardianAddr) {
     //var without0x = guardianAddress.slice(2);
-    const publicKey = utils.computePublicKey(privateKey);
+    const publicKey = utils.computePublicKey(guardianAddr);
     if (!publicKey) throw new Error('no public key');
     try {
       //var publicKeyBase64 = utils.base64.encode(publicKey);

@@ -68,7 +68,7 @@ function CryptoDemo() {
       })}
       <Button onPress={() => {
         setEncryptedShards(shards.map((shard, index) => {
-          return OurVaultCrypto.encryptShareWithGuardian(shard, newGuardians[index].privateKey);
+          return OurVaultCrypto.encryptShareWithGuardian(shard, newGuardians[index].address);
         }));
       }}>Encrypt the shards</Button>
     </div> : <></>}
