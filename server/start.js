@@ -8,6 +8,9 @@ import cors from 'cors';
 import Auth from './auth.js';
 import PubSub from './pubsub.js';
 
+//import bodpyparser
+import bodyParser from 'body-parser';
+
 import PinataClient from '@pinata/sdk';
 
 var port = process.env.PORT || 3000;
@@ -16,6 +19,7 @@ var app = express();
 
 app.use(express.json());
 app.use(cors());
+app.use(bodyParser.json());
 
 function track(req, res, next) {
   console.log(req?.headers?.host + req.url);
