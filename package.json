@@ -5,7 +5,7 @@
   "description": "hack fs 2023 ~ p2p key shard / password manager",
   "scripts": {
     "start": "if-env NODE_ENV=production && node server/start.js || vite",
-    "build-contracts": "cd hardhat && npm install --force && npx hardhat compile",
+    "build-contracts": "cd hardhat && NODE_ENV=development npm install --force && NODE_ENV=development npx hardhat compile",
     "build": "npm run build-contracts && vite build",
     "lint": "eslint frontend --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "serve": "vite preview",
@@ -15,6 +15,7 @@
     "@anephenix/hub": "^0.0.27",
     "@metamask/eth-sig-util": "^5.1.0",
     "@nextui-org/react": "^1.0.0-beta.13",
+    "@pinata/sdk": "^2.1.0",
     "@vitejs/plugin-basic-ssl": "^1.0.1",
     "@vitejs/plugin-react": "^4.0.0",
     "buffer": "^6.0.3",
