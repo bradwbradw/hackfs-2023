@@ -66,15 +66,9 @@ contract Room is ERC721, AccessControl {
         return vaultInstances[_vaultInstanceId].guardiansList;
     }
 
-    //Create a Vault Instance arrangement with:
-    //1. a requestor
-    //2. a list of guardians
-    //3. encrypted shards, one per guardian
+    //Create a Vault Instance arrangement with a list of guardians. Caller becomes requestor for the instance.
 
-    function createVaultInstance(address[] memory _guardiansList, bytes32[] memory _shards) external {
-        //@todo use shards from requestor session as NFT metadata
-
-        //Requestor is msg.sender here
+    function createVaultInstance(address[] memory _guardiansList) external {
 
         //Get the current vault instance number for an ID.
         uint _vaultInstanceId = vaultInstanceCounter.current();
