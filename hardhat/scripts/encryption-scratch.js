@@ -43,15 +43,26 @@ const decryptedSingleShare = await ethereum.request({
   params: [encryptedEOAMessage, publicKey],
 });
 
+//@todo Now the DApp should ask the Guardian for the decrypted result input.
+
 /** Encrypt for recovery by password **/
+
+//NB: better to use salts here to derive a key
 
 //Password to use as encryption key
 const password = "$ForYour85EyesOnly$"
 
-// Encrypt share with password string
-const encryptedAESMessage = ethers.utils.AES.encrypt(
-    password,
-    decryptedSingleShare
-);
+var aesCrypto = require("crypto-js/aes");
+var encoderUtf8 = require("crypto-js/enc-utf8");
 
-console.log(encryptedAESMessage);
+// Encrypt
+var ciphertext = aesCrypto.encrypt(decryptedSingleShare, password).toString();
+
+// Decrypt
+var decryptedBytes  = aesCrypto.decrypt(ciphertext, password);
+var originalSingleShare = decryptedBytes.toString(encoderUtf8);
+
+//Check
+console.log(originalSingleShare === decryptedSingleShare);
+
+//@todo next, DApp needs to deposit this on IPFS/Filecoin.
