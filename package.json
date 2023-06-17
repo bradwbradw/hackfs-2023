@@ -5,8 +5,9 @@
   "description": "hack fs 2023 ~ p2p key shard / password manager",
   "scripts": {
     "start": "if-env NODE_ENV=production && node server/start.js || vite",
-    "build": "vite build",
-    "lint": "eslint src --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+    "build-contracts": "cd hardhat && npm install --force && npx hardhat compile",
+    "build": "npm run build-contracts && vite build",
+    "lint": "eslint frontend --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "serve": "vite preview",
     "postinstall": "if-env NODE_ENV=production && npm run build || echo 'skipping prod build'"
   },

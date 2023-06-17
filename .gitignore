@@ -129,6 +129,11 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
+# hardhat subdir build stuff
+hardhat/artifacts
+hardhat/cache
+hardhat/node_modules
+
 node_modules
 web_modules
 .firebase

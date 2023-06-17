@@ -13,7 +13,7 @@ async function PubSub(port, server) {
       {
         data: {
           channel: '123abcIDHash',
-          message: 'i like turtles too ' + new Date().getTime()
+          message: 'i like turtles too (from server) ' + new Date().getTime()
         },
         socket: { clientId: 'steve' }
       });
