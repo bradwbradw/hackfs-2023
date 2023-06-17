@@ -15,7 +15,7 @@ var wsUrl;
 if (window.location.href.indexOf('localhost') > -1) {
   wsUrl = 'ws://localhost:3000';
 } else {
-  wsUrl = 'ws://our-vault.glitch.me';
+  wsUrl = 'wss://our-vault.glitch.me';
 }
 console.log('websocket url', wsUrl);
 const hubClient = new HubClient({ url: wsUrl });
