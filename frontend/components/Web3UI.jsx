@@ -42,7 +42,10 @@ function MakeUI() {
     }
   }
 
-  useEffect(() => { fetchNonce(); }, []);
+  useEffect(() => {
+    //    fetchNonce();
+  },
+    []);
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -60,9 +63,9 @@ function MakeUI() {
       }
     }
 
-    fetchUser();
+    //fetchUser();
+    //window.addEventListener('focus', fetchUser);
 
-    window.addEventListener('focus', fetchUser);
     return () => window.removeEventListener('focus', fetchUser);
   }, []);
 
@@ -106,7 +109,7 @@ function MakeUI() {
   }
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'end', alignItems: 'center', gap: '1em' }}>
+    <div style={{ display: 'flex', justifyContent: 'end', alignItems: 'center', gap: '1em', padding: '2em' }}>
       {address ? (
         <>
           Connected to {address}
