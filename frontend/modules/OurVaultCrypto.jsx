@@ -14,9 +14,6 @@ const OurVaultCrypto = {
     return shares;
   },
   encryptShareWithGuardian(share, privateKey) {
-    //var without0x = guardianAddress.slice(2);
-    //const publicKey = utils.computePublicKey(privateKey);
-    console.log("privkey no 0x", privateKey.slice(2));
     const publicKey = EthSigUtil.getEncryptionPublicKey(privateKey.slice(2));
     console.log("pubkey was:", publicKey);
     var encryptedEOAMessage = 'something went wrong';
@@ -38,9 +35,10 @@ const OurVaultCrypto = {
   decryptShareWithGuardian(encryptedShare, privateKey) {
     const decryptedShare = EthSigUtil.decrypt({
       encryptedData: encryptedShare,
-      version: 'x25519-xsalsa20-poly1305',
+      // version: 'x25519-xsalsa20-poly1305',
       privateKey: privateKey.slice(2)
     });
+
     return decryptedShare;
   },
   combineShards(shards) {
