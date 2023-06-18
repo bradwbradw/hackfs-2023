@@ -132,7 +132,6 @@ dist
 pnpm*.yaml
 
 # hardhat subdir build stuff
-hardhat/artifacts
 hardhat/cache
 hardhat/node_modules
 
