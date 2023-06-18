@@ -26,10 +26,10 @@ function Routes() {
       </Route>
 
       <div style={{ position: 'absolute', top: 0, left: 0 }} >
-        <Link to="/"> home </Link>
-        <Link to="create"> create </Link>
-        <Link to="about"> about </Link>
-        <Link to="crypto-demo"> crypto demo </Link>
+        <Link to="/" className={"link"}> home </Link>
+        <Link to="about" className={"link"}> about </Link>
+        <Link to="create" className={"link"}> create </Link>
+        <Link to="crypto-demo" className={"link"}> crypto demo </Link>
       </div>
     </>
   );

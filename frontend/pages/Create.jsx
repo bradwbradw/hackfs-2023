@@ -119,7 +119,7 @@ function Create() {
   return (
     <div className="Create">
       <h1>Create</h1>
-      <button onClick={() => setFormData({ ...formData, guardians: MockGuardians })}>dev aid fill in</button>
+      <Button onPress={() => setFormData({ ...formData, guardians: MockGuardians })}> (demo) auto-fill</Button>
       <div>
         <div>
           {address ? (
@@ -168,8 +168,10 @@ function Create() {
                   options={Contract.optionsForCreationTx(formData)}
                   onSuccess={(data) => {
                     // get some data from Contract again?
-                    console.log('success?', data);
-                    setLocation('/room/123abcIDHash');
+                    Contract.listenForRoomCreatedEvent(address => {
+                      console.log('room created event', address);
+                      setLocation('/room/' + address);
+                    });
                   }} >
                   Create
                 </WriteContractButton>
@@ -182,7 +184,7 @@ function Create() {
           </>)}
         </div>
       </div>
-      <pre>{JSON.stringify(formData, null, 2)}</pre>
+      {/*}      <pre>{JSON.stringify(formData, null, 2)}</pre>{*/}
     </div >
   );
 }

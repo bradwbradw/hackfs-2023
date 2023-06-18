@@ -33,28 +33,30 @@ function GuardianEditor({ guardian, updateFn, deleteFn, formData, setFormData })
 
   return (
     <div className='flexColumn'>
-
       <Button
         css={{ height: '$9', background: '$accents7', width: '30%' }}
         onPress={deleteFn}>
         Delete {guardian.name}
       </Button>
+      {/*}
       <Input
         label="Name"
         value={guardian.name}
         onChange={update('name')}
-      />
+      />{*/}
 
       <Input label="Address" value={guardian.address}
         onChange={validateAddress()}
         style={showWarning(guardian.address) ? { border: '1px solid red' } : {}} />
       <span style={{ color: 'red' }}>{validityWarning}</span>
 
+      {/*}
       <Input label="Secret Question" value={guardian.secretQuestion}
         onChange={update('secretQuestion')}
       />
       <Input label="Secret Answer" value={guardian.secretAnswer}
         onChange={update('secretAnswer')} />
+    {*/}
 
     </div>
   );

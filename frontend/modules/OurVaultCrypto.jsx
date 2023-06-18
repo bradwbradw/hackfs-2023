@@ -34,6 +34,17 @@ const OurVaultCrypto = {
       return "[invalid]";
     }
     return encryptedEOAMessage;
+  },
+  decryptShareWithGuardian(encryptedShare, privateKey) {
+    const decryptedShare = EthSigUtil.decrypt({
+      encryptedData: encryptedShare,
+      version: 'x25519-xsalsa20-poly1305',
+      privateKey: privateKey.slice(2)
+    });
+    return decryptedShare;
+  },
+  combineShards(shards) {
+    return secrets.combine(shards);
   }
 }
 
