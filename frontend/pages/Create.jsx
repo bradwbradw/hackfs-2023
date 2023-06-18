@@ -166,8 +166,9 @@ function Create() {
                 <WriteContractButton
                   valid={valid()}
                   options={Contract.optionsForCreationTx(formData)}
-                  onSuccess={({ hash }) => {
+                  onSuccess={(data) => {
                     // get some data from Contract again?
+                    console.log('success?', data);
                     setLocation('/room/123abcIDHash');
                   }} >
                   Create

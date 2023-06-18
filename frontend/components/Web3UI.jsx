@@ -10,6 +10,7 @@ import { WagmiConfig, createConfig, mainnet, useAccount, useConnect, useDisconne
 import { createPublicClient, http } from 'viem'
 import { InjectedConnector } from 'wagmi/connectors/injected'
 
+import _ from 'lodash'
 
 
 function MakeUI() {
