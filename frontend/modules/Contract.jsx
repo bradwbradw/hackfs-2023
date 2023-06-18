@@ -9,7 +9,7 @@ import { Button } from '@nextui-org/react'
 
 import MockGuardians from '../fixtures/guardians';
 
-const ROOMFACTORY_CONTRACT = '0xaa84ca4542bb6a0b691493271b8d74e90e722c3d';
+const ROOMFACTORY_CONTRACT = '0x52c06eCA194edd6f7d480A5f5E38205AB2184E14';
 //console.log('room abi', Room?.abi);
 const Contract = {
   optionsForCreationTx: ({
