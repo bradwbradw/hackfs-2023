@@ -3,6 +3,7 @@ import { utils, Wallet } from 'ethers'
 import * as EthSigUtil from '@metamask/eth-sig-util'
 import { Buffer } from 'buffer';
 
+window.Buffer = Buffer;
 const secrets = window.secrets;
 const OurVaultCrypto = {
   shardTheSecret(secret, numShares, numRequiredShares) {
@@ -18,10 +19,11 @@ const OurVaultCrypto = {
     console.log("privkey no 0x", privateKey.slice(2));
     const publicKey = EthSigUtil.getEncryptionPublicKey(privateKey.slice(2));
     console.log("pubkey was:", publicKey);
+    var encryptedEOAMessage = 'something went wrong';
     if (!publicKey) throw new Error('no public key');
     try {
       //var publicKeyBase64 = utils.base64.encode(publicKey);
-      const encryptedEOAMessage = EthSigUtil.encrypt({
+      encryptedEOAMessage = EthSigUtil.encrypt({
         publicKey,
         data: share,
         version: 'x25519-xsalsa20-poly1305'
