@@ -5,7 +5,7 @@ import { Link } from "wouter";
 function Home() {
   return (
     <>
-      <h1>Our Vault</h1>
+      <img src="its-our-vault.png" alt="awesome logo with 3 old keys arranged in a triangle and the words our vault in a flashy blue futuristic font" height="260" />
 
       <div className="card">
         <p style={{ fontSize: '1.3rem' }}>

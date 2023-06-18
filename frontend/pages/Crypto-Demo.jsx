@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useEffect, useState } from 'react';
-import { Button, Textarea, Input } from '@nextui-org/react';
+import { Button, Textarea, Input, Loading } from '@nextui-org/react';
 import OurVaultCrypto from '../modules/OurVaultCrypto';
 import MockGuardians from '../fixtures/guardians';
 import { Wallet } from 'ethers';
@@ -14,6 +14,7 @@ function CryptoDemo() {
   const [newGuardians, setNewGuardians] = useState([]);
   const [shardIPFSHashes, setShardIPFSHashes] = useState([]);
   const [recoveredSecret, setRecoveredSecret] = useState('');
+  const [loading, setLoading] = useState(false);
 
   function makeGuardians() {
     var newG = [0, 1, 2].map(i => {
@@ -28,6 +29,7 @@ function CryptoDemo() {
     setNewGuardians(newG);
   }
   function uploadShards() {
+    setLoading(true);
 
     Promise.all(encryptedShards.map(shard => {
 
@@ -37,9 +39,14 @@ function CryptoDemo() {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({ shard })
-      }).then(res => { return res.json(); });
+      }).then(res => {
+        return res.json();
+      });
     })).then(hashes => {
       setShardIPFSHashes(hashes);
+      setLoading(false);
+    }).catch(() => {
+      setLoading(false);
     })
   }
 
@@ -53,7 +60,8 @@ function CryptoDemo() {
     var recoveredSecret = OurVaultCrypto.combineShards(decryptedShards);
     console.log("recoveredSecret: ", recoveredSecret);
     var unhexedRecoveredSecret = secrets.hex2str(recoveredSecret);
-    setSecret(unhexedRecoveredSecret);
+    console.log("unhexed", unhexedRecoveredSecret);
+    setRecoveredSecret(unhexedRecoveredSecret);
 
 
   }
@@ -89,15 +97,24 @@ function CryptoDemo() {
         }}>Encrypt the shards</Button>
       </div> : <></>}
 
-      {encryptedShards.length > 1 ? <div>
+      {encryptedShards.length > 1 ? <div >
         <h3>encrypted shards look like this:</h3>
         {encryptedShards.map((shard, index) => {
-          return <pre height="10" key={index} label={`encrypted shard ${index + 1}`} >
-            {JSON.stringify(shard, null, 2)}
-          </pre>
+          return (<div key={index}>
+            <h4>shard {index + 1}</h4>
+            <pre
+              height="10"
+              key={index}
+              style={{ minWidth: '40%' }}
+            >
+              {JSON.stringify(shard, null, 2)}
+            </pre>
+          </div>
+          );
         })}
         <div>
           <Button onPress={() => uploadShards()}>Upload the encrypted shards to IPFS</Button>
+          {loading ? <Loading /> : <></>}
         </div>
 
 
@@ -119,13 +136,15 @@ function CryptoDemo() {
             And the reference to these shards is stored on-chain in the soulbound Vault NFT.
           </p>
           <p>For brevity, we omit the second layer of encryption that would be in the final product </p>
-
-          <h4>delete one shard! We only need 2 our of three, thanks to the magic of SHAMIR</h4>
+          <br /><br />
+          <h4>Now, delete one shard! We only need 2 our of three, thanks to the magic of SHAMIR</h4>
           <Button onPress={() => {
             // delete only the first shard
-            setEncryptedShards(encryptedShards.slice(1));
+            setEncryptedShards([encryptedShards[0], encryptedShards[1]]);
+            setShardIPFSHashes([shardIPFSHashes[0], shardIPFSHashes[1]]);
 
-          }}>Delete Shard 1</Button>
+
+          }}>Delete Shard 1</Button><br /><br />
 
           <Button onPress={() => finishRecovery()}>Recover the secret!</Button>
         </div> : <></>}
