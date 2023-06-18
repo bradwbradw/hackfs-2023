@@ -1,8 +1,7 @@
 //import secrets from 'secrets.js-grempe/secrets.js';
 import { utils, Wallet } from 'ethers'
-
-
 import * as EthSigUtil from '@metamask/eth-sig-util'
+import { Buffer } from 'buffer';
 
 const secrets = window.secrets;
 const OurVaultCrypto = {
@@ -13,9 +12,12 @@ const OurVaultCrypto = {
     console.log(comb, key);
     return shares;
   },
-  encryptShareWithGuardian(share, guardianAddr) {
+  encryptShareWithGuardian(share, privateKey) {
     //var without0x = guardianAddress.slice(2);
-    const publicKey = utils.computePublicKey(guardianAddr);
+    //const publicKey = utils.computePublicKey(privateKey);
+    console.log("privkey no 0x", privateKey.slice(2));
+    const publicKey = EthSigUtil.getEncryptionPublicKey(privateKey.slice(2));
+    console.log("pubkey was:", publicKey);
     if (!publicKey) throw new Error('no public key');
     try {
       //var publicKeyBase64 = utils.base64.encode(publicKey);

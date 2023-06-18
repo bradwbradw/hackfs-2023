@@ -6,7 +6,6 @@ import OurVaultCrypto from '../modules/OurVaultCrypto';
 import MockGuardians from '../fixtures/guardians';
 import { Wallet } from 'ethers';
 
-
 function CryptoDemo() {
 
   const [secret, setSecret] = useState('hotel obvious agent lecture gadget evil jealous keen fragile before damp clarify bottle pencil sunshine rampant utility crouch camping weather vehicle lamp trap viscous')
@@ -68,7 +67,7 @@ function CryptoDemo() {
       })}
       <Button onPress={() => {
         setEncryptedShards(shards.map((shard, index) => {
-          return OurVaultCrypto.encryptShareWithGuardian(shard, newGuardians[index].address);
+          return OurVaultCrypto.encryptShareWithGuardian(shard, newGuardians[index].privateKey);
         }));
       }}>Encrypt the shards</Button>
     </div> : <></>}
