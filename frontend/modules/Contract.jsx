@@ -30,7 +30,8 @@ const Contract = {
     }
   },
   listenForRoomCreatedEvent: (callback) => {
-    return watchContractEvent(
+    console.log('waiting for event....');
+    watchContractEvent(
       {
         address: ROOMFACTORY_CONTRACT,
         abi: RoomFactory.abi,

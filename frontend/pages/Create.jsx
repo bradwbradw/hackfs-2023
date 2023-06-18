@@ -16,6 +16,7 @@ import WriteContractButton from "../components/WriteContractButton";
 function Create() {
   const { address, isConnecting, isDisconnected } = useAccount();
   const [location, setLocation] = useLocation();
+  const [waitingForEvent, setWaitingForEvent] = useState(false);
 
   var defaultFormData = {
     guardians: [
@@ -164,12 +165,15 @@ function Create() {
               <div className='flexCenter flexColumn'>
 
                 <WriteContractButton
-                  valid={valid()}
+                  valid={valid() && !waitingForEvent}
                   options={Contract.optionsForCreationTx(formData)}
                   onSuccess={(data) => {
                     // get some data from Contract again?
+                    setWaitingForEvent(true);
+
                     Contract.listenForRoomCreatedEvent(address => {
                       console.log('room created event', address);
+                      setWaitingForEvent(false);
                       setLocation('/room/' + address);
                     });
                   }} >
