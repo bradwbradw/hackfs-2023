@@ -1,4 +1,3 @@
-//import secrets from 'secrets.js-grempe/secrets.js';
 import { utils, Wallet } from 'ethers'
 import * as EthSigUtil from '@metamask/eth-sig-util'
 import { Buffer } from 'buffer';
@@ -7,10 +6,10 @@ window.Buffer = Buffer;
 const secrets = window.secrets;
 const OurVaultCrypto = {
   shardTheSecret(secret, numShares, numRequiredShares) {
-    const key = secrets.random(512);
-    const shares = secrets.share(key, numShares, numRequiredShares);
-    const comb = secrets.combine(shares);
-    console.log(comb, key);
+    const hexedSecret = secrets.str2hex(secret);
+    const shares = secrets.share(hexedSecret, numShares, numRequiredShares, 512);
+    console.log(secrets.extractShareComponents(shares[0]));
+    console.log(hexedSecret, shares);
     return shares;
   },
   encryptShareWithGuardian(share, privateKey) {
@@ -19,7 +18,6 @@ const OurVaultCrypto = {
     var encryptedEOAMessage = 'something went wrong';
     if (!publicKey) throw new Error('no public key');
     try {
-      //var publicKeyBase64 = utils.base64.encode(publicKey);
       encryptedEOAMessage = EthSigUtil.encrypt({
         publicKey,
         data: share,
@@ -35,13 +33,13 @@ const OurVaultCrypto = {
   decryptShareWithGuardian(encryptedShare, privateKey) {
     const decryptedShare = EthSigUtil.decrypt({
       encryptedData: encryptedShare,
-      // version: 'x25519-xsalsa20-poly1305',
       privateKey: privateKey.slice(2)
     });
 
     return decryptedShare;
   },
   combineShards(shards) {
+    console.log("shards: ", shards);
     return secrets.combine(shards);
   }
 }

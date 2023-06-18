@@ -51,7 +51,9 @@ function CryptoDemo() {
       return OurVaultCrypto.decryptShareWithGuardian(shard, newGuardians[index].privateKey);
     });
     var recoveredSecret = OurVaultCrypto.combineShards(decryptedShards);
-    setSecret(recoveredSecret);
+    console.log("recoveredSecret: ", recoveredSecret);
+    var unhexedRecoveredSecret = secrets.hex2str(recoveredSecret);
+    setSecret(unhexedRecoveredSecret);
 
 
   }
