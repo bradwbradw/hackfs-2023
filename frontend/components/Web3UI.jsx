@@ -5,12 +5,20 @@ import { useEffect, useState } from 'react';
 import { Button } from '@nextui-org/react'
 
 import { WagmiConfig, createConfig, mainnet, useAccount, useConnect, useDisconnect, useNetwork, useSignMessage } from 'wagmi'
+import { configureChains } from '@wagmi/core'
+import { filecoinCalibration, hardhat, localhost } from '@wagmi/core/chains'
+import { jsonRpcProvider } from 'wagmi/providers/jsonRpc'
 
 //import { SiweMessage } from 'siwe'
 import { createPublicClient, http } from 'viem'
 import { InjectedConnector } from 'wagmi/connectors/injected'
 
 import _ from 'lodash'
+
+const { chains, publicClient } = configureChains(
+  [mainnet, filecoinCalibration, hardhat, localhost],
+  [jsonRpcProvider],
+)
 
 
 function MakeUI() {
@@ -135,8 +143,9 @@ function Web3UI({ children }) {
 
   const wagmiConfig = createConfig({
     autoConnect: true,
+    chains,
     publicClient: createPublicClient({
-      chain: mainnet,
+      connectors:[new InjectedConnector({ chains })],
       transport: http(),
     }),
   });

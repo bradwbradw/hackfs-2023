@@ -9,7 +9,7 @@ import { Button } from '@nextui-org/react'
 
 import MockGuardians from '../fixtures/guardians';
 
-const ROOMFACTORY_CONTRACT = '0x52c06eCA194edd6f7d480A5f5E38205AB2184E14';
+const ROOMFACTORY_CONTRACT = '0x5FbDB2315678afecb367f032d93F642f64180aa3';
 //console.log('room abi', Room?.abi);
 const Contract = {
   optionsForCreationTx: ({
@@ -36,6 +36,8 @@ const Contract = {
         address: ROOMFACTORY_CONTRACT,
         abi: RoomFactory.abi,
         eventName: 'RoomDeployed',
+        //chainId: 314159 //FileCoin Calibration Testnet
+        chainId: 31337
       },
       (eventData) => {
         console.log('eventData', eventData);
